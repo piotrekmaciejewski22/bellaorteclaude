@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e9d3b5"/>
+      <stop offset="60%" stop-color="#f3e2c5"/>
+      <stop offset="100%" stop-color="#f8f4ec"/>
+    </linearGradient>
+    <linearGradient id="hhill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1f6f43"/>
+      <stop offset="100%" stop-color="#0f2418"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#hsky)"/>
+  <circle cx="1180" cy="220" r="80" fill="#b43a32" opacity="0.25"/>
+  <circle cx="1180" cy="220" r="55" fill="#b85c38" opacity="0.3"/>
+  <path d="M0 600 L150 540 L300 580 L420 500 L580 540 L740 480 L900 530 L1060 490 L1240 540 L1400 510 L1600 555 L1600 900 L0 900 Z" fill="url(#hhill)" opacity="0.9"/>
+  <g fill="#b85c38" opacity="0.9">
+    <rect x="600" y="430" width="50" height="120"/>
+    <rect x="660" y="400" width="65" height="150"/>
+    <rect x="735" y="380" width="80" height="170"/>
+    <rect x="825" y="360" width="90" height="190"/>
+    <rect x="925" y="380" width="80" height="170"/>
+    <rect x="1015" y="400" width="65" height="150"/>
+    <rect x="1090" y="430" width="50" height="120"/>
+    <polygon points="600,430 625,410 650,430"/>
+    <polygon points="660,400 692,378 725,400"/>
+    <polygon points="735,380 775,355 815,380"/>
+    <polygon points="825,360 870,330 915,360"/>
+    <polygon points="925,380 965,355 1005,380"/>
+    <polygon points="1015,400 1047,378 1080,400"/>
+    <polygon points="1090,430 1115,410 1140,430"/>
+  </g>
+  <g fill="#1e1c18" opacity="0.55">
+    <rect x="615" y="460" width="8" height="14"/>
+    <rect x="630" y="460" width="8" height="14"/>
+    <rect x="675" y="430" width="10" height="16"/>
+    <rect x="695" y="430" width="10" height="16"/>
+    <rect x="710" y="430" width="10" height="16"/>
+    <rect x="755" y="405" width="12" height="18"/>
+    <rect x="775" y="405" width="12" height="18"/>
+    <rect x="795" y="405" width="12" height="18"/>
+    <rect x="845" y="385" width="14" height="20"/>
+    <rect x="868" y="385" width="14" height="20"/>
+    <rect x="891" y="385" width="14" height="20"/>
+    <rect x="945" y="405" width="12" height="18"/>
+    <rect x="965" y="405" width="12" height="18"/>
+    <rect x="985" y="405" width="12" height="18"/>
+    <rect x="1030" y="430" width="10" height="16"/>
+    <rect x="1050" y="430" width="10" height="16"/>
+    <rect x="1065" y="430" width="10" height="16"/>
+    <rect x="1100" y="460" width="8" height="14"/>
+    <rect x="1115" y="460" width="8" height="14"/>
+  </g>
+</svg>

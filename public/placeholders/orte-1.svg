@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e9d3b5"/>
+      <stop offset="100%" stop-color="#f8f4ec"/>
+    </linearGradient>
+    <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1f6f43"/>
+      <stop offset="100%" stop-color="#163a26"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#sky)"/>
+  <path d="M0 320 L120 290 L220 310 L300 270 L380 295 L460 280 L560 300 L660 285 L800 305 L800 500 L0 500 Z" fill="url(#hill)" opacity="0.85"/>
+  <g fill="#b85c38" opacity="0.9">
+    <rect x="220" y="220" width="40" height="80"/>
+    <rect x="270" y="200" width="50" height="100"/>
+    <rect x="330" y="180" width="60" height="120"/>
+    <rect x="400" y="200" width="50" height="100"/>
+    <rect x="460" y="220" width="45" height="80"/>
+    <polygon points="220,220 240,205 260,220"/>
+    <polygon points="270,200 295,185 320,200"/>
+    <polygon points="330,180 360,165 390,180"/>
+    <polygon points="400,200 425,185 450,200"/>
+    <polygon points="460,220 482,205 505,220"/>
+  </g>
+  <g fill="#1e1c18" opacity="0.6">
+    <rect x="232" y="240" width="6" height="10"/>
+    <rect x="246" y="240" width="6" height="10"/>
+    <rect x="282" y="220" width="8" height="12"/>
+    <rect x="300" y="220" width="8" height="12"/>
+    <rect x="346" y="200" width="10" height="14"/>
+    <rect x="364" y="200" width="10" height="14"/>
+    <rect x="412" y="220" width="8" height="12"/>
+    <rect x="430" y="220" width="8" height="12"/>
+  </g>
+  <text x="400" y="450" font-family="Georgia, serif" font-size="22" fill="#1e1c18" text-anchor="middle" opacity="0.55">Casa Orte Uno · zdjęcie wkrótce</text>
+</svg>

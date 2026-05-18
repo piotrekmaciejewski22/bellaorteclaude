@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+/*
+ * Tailwind CSS v4 — CSS-only config.
+ *
+ * Italian_Flag_Theme: paleta inspirowana flagą Włoch w eleganckim, ciepłym
+ * wydaniu (zieleń, ivory/biel, terracotta zamiast jaskrawej czerwieni).
+ * Tokeny są zarejestrowane w bloku `@theme`, dzięki czemu Tailwind v4
+ * wystawia zarówno zmienne CSS (`var(--color-ivory)`), jak i utility classes
+ * (np. `bg-ivory`, `text-ink`, `border-border`).
+ *
+ * Wymaganie 45: System kolorów flagi Włoch + typografia.
+ */
+
+@theme {
+  /* Tła i powierzchnie publicznej strony. */
+  --color-ivory: #f8f4ec;
+  --color-flag-white: #ffffff;
+  --color-soft-green: #e8f1ea;
+
+  /* Akcenty marki. */
+  --color-italian-green: #1f6f43;
+  --color-italian-red: #b43a32;
+  --color-terracotta: #b85c38;
+  --color-sky-accent: #8fb3c8;
+
+  /* Tekst i kolory ciemne. */
+  --color-ink: #1e1c18;
+  --color-cypress: #223126;
+  /* Drugorzędny tekst — wyciszony wariant cypress, czytelny na ivory/biel. */
+  --color-muted: #5b6660;
+
+  /* Powierzchnie spokojne / dekoracyjne. */
+  --color-travertine: #d8c7aa;
+  /* Granice — jaśniejszy wariant travertine, łagodne separatory na ivory. */
+  --color-border: #e2d9c5;
+
+  /* Rodziny fontów — zmienne ustawiane przez `next/font` w root layout. */
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-ivory);
+  line-height: 1.5;
+}
+
+@layer utilities {
+  /* Bezpośrednie aliasy rodzin fontów. */
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-ui {
+    font-family: var(--font-sans);
+  }
+
+  /* Nagłówek hero / sekcji głównych — display, zwarta interlinia. */
+  .heading-display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  /* Nagłówek sekcji niższego poziomu — display, lekko luźniejsza interlinia. */
+  .heading-section {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  /* Domyślny tekst UI — Inter, czytelna interlinia. */
+  .text-ui {
+    font-family: var(--font-sans);
+    line-height: 1.5;
+  }
+
+  /* Kicker / etykieta nad nagłówkiem — uppercase, rozstrzelona, wyciszona. */
+  .text-eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+  }
+}
+
+@layer components {
+  /* Markdown body — prosty styl dla treści zewnętrznych typu polityka prywatności. */
+  .markdown-body {
+    color: var(--color-cypress);
+    line-height: 1.7;
+  }
+  .markdown-body h1 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--color-ink);
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  .markdown-body h2 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    line-height: 1.2;
+    font-weight: 600;
+    color: var(--color-ink);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  .markdown-body h3 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .markdown-body p {
+    margin: 0 0 1rem;
+  }
+  .markdown-body ul,
+  .markdown-body ol {
+    padding-left: 1.5rem;
+    margin: 0 0 1rem;
+  }
+  .markdown-body li {
+    margin: 0.25rem 0;
+  }
+  .markdown-body a {
+    color: var(--color-italian-green);
+    text-decoration: underline;
+  }
+  .markdown-body a:hover {
+    color: var(--color-cypress);
+  }
+  .markdown-body strong {
+    color: var(--color-ink);
+  }
+  .markdown-body code {
+    background: var(--color-soft-green);
+    padding: 0.1em 0.35em;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+  }
+  .markdown-body blockquote {
+    border-left: 3px solid var(--color-italian-green);
+    padding-left: 1rem;
+    color: var(--color-muted);
+    margin: 1rem 0;
+  }
+}

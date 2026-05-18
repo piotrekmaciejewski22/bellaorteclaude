@@ -1,0 +1,27 @@
+# dependencies
+/node_modules
+.npm-cache
+
+# next
+/.next
+/out
+
+# production
+/build
+
+# env
+.env*
+!.env.example
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# system
+.DS_Store
+Thumbs.db
+
+# types
+next-env.d.ts
