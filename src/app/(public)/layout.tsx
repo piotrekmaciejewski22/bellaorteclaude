@@ -7,6 +7,7 @@
 
 import { SiteHeader } from "@/components/public/SiteHeader";
 import { SiteFooter } from "@/components/public/SiteFooter";
+import { BackgroundMusic } from "@/components/public/BackgroundMusic";
 
 export default function PublicLayout({
   children,
@@ -18,6 +19,7 @@ export default function PublicLayout({
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter />
+      <BackgroundMusic />
     </div>
   );
 }

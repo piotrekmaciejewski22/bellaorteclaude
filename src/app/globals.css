@@ -317,3 +317,15 @@ body {
   .markdown-body [style*="text-align: left"] { text-align: left; }
   .markdown-body u { text-decoration: underline; }
 }
+
+
+/* Animacja paseczków equalizera w playerze muzyki tła. */
+@keyframes music-bar-pulse {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+.bg-music-bar {
+  animation: music-bar-pulse 600ms ease-in-out infinite;
+  transform-origin: center bottom;
+}
