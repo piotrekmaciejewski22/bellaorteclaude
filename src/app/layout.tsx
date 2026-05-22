@@ -1,16 +1,32 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Inter, Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 
-// Display: elegancki kroj inspirowany Cormorant Garamond — nagłówki publiczne.
-const cormorantGaramond = Cormorant_Garamond({
+/*
+ * Display: Playfair Display — klasyczny włoski serif w stylu Bodoni, z
+ * silnym kontrastem między cienkimi i grubymi kreskami. Ładuje też italic
+ * (kursywę) bo używamy jej w subtytułach magazynowych.
+ */
+const playfair = Playfair_Display({
   subsets: ["latin", "latin-ext"],
-  weight: ["500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
 
-// UI: neutralny Inter — formularze, kalendarz, tabele, panel admina.
+/*
+ * Cormorant Garamond — wcześniejszy display, zostawiam jako fallback dla
+ * stron które jeszcze go używają. Po pełnym refactorze można usunąć.
+ */
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin", "latin-ext"],
+  weight: ["500", "600"],
+  variable: "--font-script",
+  display: "swap",
+});
+
+/* UI: Inter — neutralny, dobrze czyta się w formularzach i panelu admina. */
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700"],
@@ -19,9 +35,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "BELLAORTE | Orte, Włochy",
+  title: "BELLAORTE — Apartamenty w sercu Tuscia, godzinę od Rzymu",
   description:
-    "BELLAORTE — dwa apartamenty w Orte z kalendarzem dostępności, przewodnikiem i panelem admina.",
+    "Dwa kameralne apartamenty w zabytkowym Orte. Spokój doliny Tybru, sąsiedztwo Bomarzo i Civita di Bagnoregio, bezpośredni pociąg do Rzymu. Bez płatności online — kontakt mailowy.",
 };
 
 export default function RootLayout({
@@ -32,9 +48,9 @@ export default function RootLayout({
   return (
     <html
       lang="pl"
-      className={`${cormorantGaramond.variable} ${inter.variable}`}
+      className={`${playfair.variable} ${cormorant.variable} ${inter.variable}`}
     >
-      <body>{children}</body>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

@@ -58,14 +58,14 @@ export function MobileNav({ links }: MobileNavProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Menu mobilne"
-          className="fixed inset-0 top-16 z-30 flex flex-col gap-2 overflow-y-auto bg-ivory px-6 py-8"
+          className="fixed inset-0 top-20 z-30 flex flex-col gap-2 overflow-y-auto bg-crema px-6 py-10"
         >
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="block rounded-lg px-4 py-4 text-lg font-medium text-cypress hover:bg-soft-green"
+              className="block px-4 py-4 font-display text-2xl italic text-cypress hover:text-terracotta"
             >
               {link.label}
             </Link>
@@ -73,9 +73,9 @@ export function MobileNav({ links }: MobileNavProps) {
           <Link
             href="/booking"
             onClick={() => setOpen(false)}
-            className="mt-4 block rounded-full bg-italian-green px-6 py-4 text-center text-base font-semibold text-flag-white"
+            className="mt-4 block border border-gold bg-transparent px-6 py-4 text-center font-display italic text-cypress hover:bg-gold/10"
           >
-            Sprawdź dostępność
+            <span className="text-gold">·</span> Rezerwacja
           </Link>
         </div>
       )}

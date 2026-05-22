@@ -1,43 +1,55 @@
 @import "tailwindcss";
 
 /*
- * Tailwind CSS v4 — CSS-only config.
+ * BELLAORTE — system designerski.
  *
- * Italian_Flag_Theme: paleta inspirowana flagą Włoch w eleganckim, ciepłym
- * wydaniu (zieleń, ivory/biel, terracotta zamiast jaskrawej czerwieni).
- * Tokeny są zarejestrowane w bloku `@theme`, dzięki czemu Tailwind v4
- * wystawia zarówno zmienne CSS (`var(--color-ivory)`), jak i utility classes
- * (np. `bg-ivory`, `text-ink`, `border-border`).
+ * Inspiracje: magazyn Cabana, Aman/Six Senses, klasyczna włoska grafika
+ * (Bodoni / Didone). Paleta opiera się na ciepłych tonach kamiennego
+ * stoku Toskanii: kremowe ivory, oliwka, terracotta, kamień, wino,
+ * subtelne złoto na detalach.
  *
- * Wymaganie 45: System kolorów flagi Włoch + typografia.
+ * Tokens są zarejestrowane w `@theme` dzięki czemu Tailwind v4 wystawia
+ * automatycznie utility classes (`bg-crema`, `text-olive`, itp.).
  */
 
 @theme {
-  /* Tła i powierzchnie publicznej strony. */
-  --color-ivory: #f8f4ec;
+  /* ---------- Tła i powierzchnie ---------- */
+  --color-crema: #f5ede0;          /* ciepłe ivory, jak ściany w Toskanii */
+  --color-ivory: #faf6ee;          /* jaśniejsza odmiana, dla kart */
   --color-flag-white: #ffffff;
-  --color-soft-green: #e8f1ea;
+  --color-soft-green: #e8eadb;     /* zielonkawe wapno, dyskretne tło */
+  --color-paper: #efe6d4;          /* karta strony książki */
 
-  /* Akcenty marki. */
-  --color-italian-green: #1f6f43;
-  --color-italian-red: #b43a32;
-  --color-terracotta: #b85c38;
+  /* ---------- Akcenty ---------- */
+  --color-olive: #5b6342;          /* dojrzała oliwka — główny akcent */
+  --color-olive-deep: #3d422c;     /* ciemniejsza dla hover */
+  --color-italian-green: #5b6342;  /* alias dla zgodności wstecz */
+
+  --color-terracotta: #b85c38;     /* terakota dachówek */
+  --color-terracotta-soft: #d18a6a;
+  --color-italian-red: #6b1f2c;    /* wino, kolor wstęg ślubnych */
+  --color-wine: #6b1f2c;
+
+  --color-gold: #b08a3e;           /* delikatne złoto, akcenty */
+  --color-gold-soft: #d8be7e;
   --color-sky-accent: #8fb3c8;
 
-  /* Tekst i kolory ciemne. */
-  --color-ink: #1e1c18;
-  --color-cypress: #223126;
-  /* Drugorzędny tekst — wyciszony wariant cypress, czytelny na ivory/biel. */
-  --color-muted: #5b6660;
+  /* ---------- Tekst ---------- */
+  --color-ink: #2a2618;            /* prawie czarny, ale ciepły */
+  --color-cypress: #3d422c;        /* ciemna oliwka — tekst na ivory */
+  --color-muted: #7a715f;          /* drugi plan */
+  --color-stone: #8a7e6a;          /* trzeci plan, kamień */
 
-  /* Powierzchnie spokojne / dekoracyjne. */
+  /* ---------- Powierzchnie spokojne ---------- */
   --color-travertine: #d8c7aa;
-  /* Granice — jaśniejszy wariant travertine, łagodne separatory na ivory. */
-  --color-border: #e2d9c5;
+  --color-border: #d8cdb8;         /* delikatna kreska kamienna */
+  --color-border-warm: #c9b896;    /* ciemniejsza kreska, do akcentów */
 
-  /* Rodziny fontów — zmienne ustawiane przez `next/font` w root layout. */
+  /* ---------- Fonty (zmienne z next/font) ---------- */
   --font-display: var(--font-display);
+  --font-display-italic: var(--font-display);
   --font-sans: var(--font-sans);
+  --font-script: var(--font-script);
 }
 
 * {
@@ -52,114 +64,249 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   color: var(--color-ink);
-  background: var(--color-ivory);
-  line-height: 1.5;
+  background: var(--color-crema);
+  line-height: 1.65;
+  /*
+   * Subtelna tekstura papieru — bardzo delikatna, nie rozprasza.
+   * Dwa nakładające się gradients tworzą wrażenie nierównego stoku.
+   */
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(176, 138, 62, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(184, 92, 56, 0.04) 0%, transparent 60%);
+  background-attachment: fixed;
 }
 
 @layer utilities {
-  /* Bezpośrednie aliasy rodzin fontów. */
+  /* ---------- Rodziny fontów ---------- */
   .font-display {
     font-family: var(--font-display);
+    font-feature-settings: "lnum", "kern";
+  }
+
+  .font-script {
+    font-family: var(--font-script);
   }
 
   .font-ui {
     font-family: var(--font-sans);
   }
 
-  /* Nagłówek hero / sekcji głównych — display, zwarta interlinia. */
+  /* ---------- Skala typograficzna magazynowa ---------- */
+
+  /* Hero serwisu — bardzo duży, kontrastowy serif. */
   .heading-display {
     font-family: var(--font-display);
-    font-weight: 600;
-    line-height: 1.1;
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
   }
 
-  /* Nagłówek sekcji niższego poziomu — display, lekko luźniejsza interlinia. */
+  /* Sekcje — duży serif. */
   .heading-section {
     font-family: var(--font-display);
-    font-weight: 600;
-    line-height: 1.2;
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
   }
 
-  /* Domyślny tekst UI — Inter, czytelna interlinia. */
+  /* Subtytuł kursywą — typowe dla włoskich magazynów. */
+  .heading-italic {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0;
+    color: var(--color-stone);
+  }
+
+  /* Tekst UI bazowy. */
   .text-ui {
     font-family: var(--font-sans);
-    line-height: 1.5;
+    line-height: 1.65;
   }
 
-  /* Kicker / etykieta nad nagłówkiem — uppercase, rozstrzelona, wyciszona. */
+  /* Kicker — uppercase rozstrzelone, ze złotym akcentem. */
   .text-eyebrow {
     font-family: var(--font-sans);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-muted);
+    letter-spacing: 0.18em;
+    color: var(--color-stone);
+  }
+
+  /* Cytat / motto włoskie. */
+  .text-motto {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--color-terracotta);
+    letter-spacing: 0.01em;
+  }
+
+  /* Wyróżnik liczbowy / rzymski w kółku. */
+  .badge-roman {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-style: italic;
+    letter-spacing: 0.05em;
+  }
+
+  /* Drop cap — pierwsza litera akapitu. Dla blogu i artykułów. */
+  .drop-cap::first-letter {
+    font-family: var(--font-display);
+    font-weight: 500;
+    float: left;
+    font-size: 4.5rem;
+    line-height: 0.85;
+    margin: 0.2rem 0.6rem 0 0;
+    color: var(--color-terracotta);
+  }
+
+  /* Cienka kreska ozdobna — pod nagłówkami sekcji. */
+  .rule-thin {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--color-gold) 30%, var(--color-gold) 70%, transparent 100%);
+  }
+
+  /* Hover-podkreślenie linków — rysuje się od lewej. */
+  .link-italic {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .link-italic::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 250ms ease-out;
+  }
+  .link-italic:hover::after,
+  .link-italic:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* Cień ciepły, jak słońce na białej ścianie. */
+  .shadow-warm {
+    box-shadow:
+      0 1px 2px rgba(42, 38, 24, 0.04),
+      0 8px 24px -8px rgba(184, 92, 56, 0.08);
+  }
+  .shadow-warm-lg {
+    box-shadow:
+      0 2px 4px rgba(42, 38, 24, 0.05),
+      0 20px 40px -16px rgba(184, 92, 56, 0.15);
   }
 }
 
 @layer components {
-  /* Markdown body — prosty styl dla treści zewnętrznych typu polityka prywatności. */
+  /* Markdown body — używane przez politykę prywatności i bloga. */
   .markdown-body {
     color: var(--color-cypress);
-    line-height: 1.7;
+    line-height: 1.8;
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
   }
   .markdown-body h1 {
     font-family: var(--font-display);
-    font-size: 2.5rem;
-    line-height: 1.1;
-    font-weight: 600;
+    font-size: 2.75rem;
+    line-height: 1.05;
+    font-weight: 500;
     color: var(--color-ink);
-    margin-top: 0;
-    margin-bottom: 1rem;
+    margin: 0 0 1.5rem;
+    letter-spacing: -0.02em;
   }
   .markdown-body h2 {
     font-family: var(--font-display);
-    font-size: 1.75rem;
-    line-height: 1.2;
-    font-weight: 600;
+    font-size: 2rem;
+    line-height: 1.15;
+    font-weight: 500;
     color: var(--color-ink);
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
+    margin: 2.5rem 0 1rem;
+    letter-spacing: -0.01em;
   }
   .markdown-body h3 {
     font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-weight: 600;
-    color: var(--color-ink);
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
+    font-style: italic;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--color-terracotta);
+    margin: 2rem 0 0.75rem;
   }
   .markdown-body p {
-    margin: 0 0 1rem;
+    margin: 0 0 1.25rem;
   }
   .markdown-body ul,
   .markdown-body ol {
     padding-left: 1.5rem;
-    margin: 0 0 1rem;
+    margin: 0 0 1.25rem;
   }
   .markdown-body li {
-    margin: 0.25rem 0;
+    margin: 0.4rem 0;
   }
   .markdown-body a {
-    color: var(--color-italian-green);
+    color: var(--color-terracotta);
     text-decoration: underline;
+    text-decoration-color: var(--color-gold-soft);
+    text-underline-offset: 3px;
+    transition: color 200ms;
   }
   .markdown-body a:hover {
-    color: var(--color-cypress);
+    color: var(--color-wine);
   }
   .markdown-body strong {
     color: var(--color-ink);
+    font-weight: 600;
+  }
+  .markdown-body em {
+    font-style: italic;
+    color: var(--color-terracotta);
+  }
+  .markdown-body blockquote {
+    border-left: 2px solid var(--color-gold);
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    margin: 1.5rem 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--color-stone);
+    line-height: 1.4;
   }
   .markdown-body code {
     background: var(--color-soft-green);
-    padding: 0.1em 0.35em;
+    padding: 0.1em 0.4em;
     border-radius: 0.25rem;
-    font-size: 0.9em;
+    font-size: 0.85em;
+    font-family: ui-monospace, monospace;
   }
-  .markdown-body blockquote {
-    border-left: 3px solid var(--color-italian-green);
-    padding-left: 1rem;
-    color: var(--color-muted);
-    margin: 1rem 0;
+  .markdown-body img {
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+    max-width: 100%;
+    height: auto;
+  }
+  .markdown-body hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%);
+    margin: 3rem 0;
+  }
+
+  /* Drop cap dla pierwszego akapitu artykułu. */
+  .markdown-body > p:first-of-type::first-letter {
+    font-family: var(--font-display);
+    font-weight: 500;
+    float: left;
+    font-size: 4.5rem;
+    line-height: 0.85;
+    margin: 0.3rem 0.6rem 0 0;
+    color: var(--color-terracotta);
   }
 }

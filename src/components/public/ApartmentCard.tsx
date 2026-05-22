@@ -1,11 +1,8 @@
 /**
- * ApartmentCard — card linking to one apartment's detail page.
+ * ApartmentCard — w stylu karty z magazynu wnętrzarskiego.
  *
- * Server Component. Currently uses mock SVG hero from `/placeholders/`;
- * once `gallery_photos` bucket has real assets, swap for the first
- * gallery photo URL.
- *
- * Wymaganie 4 (no price in UI).
+ * Numerek rzymski w gold-frame, kursywne nazwy detali, gold underline na
+ * hover. Brak ceny w UI (Wym. 4).
  */
 
 import Link from "next/link";
@@ -17,94 +14,108 @@ interface ApartmentCardProps {
   apartment: Apartment;
   heroSrc: string;
   nextAvailability?: string;
+  numeral?: "I" | "II";
 }
 
 export function ApartmentCard({
   apartment,
   heroSrc,
   nextAvailability,
+  numeral,
 }: ApartmentCardProps) {
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-flag-white shadow-sm transition-shadow hover:shadow-md">
+    <article className="group relative">
+      {/* Numer rzymski wystający */}
+      {numeral && (
+        <div
+          aria-hidden="true"
+          className="absolute -top-4 left-6 z-10 inline-flex h-12 w-12 items-center justify-center rounded-full border border-gold bg-crema badge-roman text-base text-gold"
+        >
+          {numeral}
+        </div>
+      )}
+
       <Link
         href={`/apartments/${apartment.slug}`}
-        className="relative block aspect-[4/3] w-full overflow-hidden"
+        className="block overflow-hidden border border-gold/30 bg-crema transition-all hover:border-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
         aria-label={`Zobacz szczegóły apartamentu ${apartment.name}`}
       >
-        <Image
-          src={heroSrc}
-          alt={`Widok apartamentu ${apartment.name}`}
-          fill
-          unoptimized
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(min-width: 768px) 50vw, 100vw"
-        />
-        {nextAvailability && (
-          <span className="absolute left-4 top-4 rounded-full bg-flag-white/95 px-3 py-1 text-xs font-medium text-italian-green shadow-sm">
-            {nextAvailability}
-          </span>
-        )}
-      </Link>
-
-      <div className="flex flex-1 flex-col gap-4 p-6">
-        <div>
-          <p className="text-eyebrow">{apartment.bedrooms === 1 ? "Apartament dla pary" : "Apartament rodzinny"}</p>
-          <h3 className="heading-section mt-2 text-3xl text-ink">
-            <Link
-              href={`/apartments/${apartment.slug}`}
-              className="hover:text-italian-green focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-italian-green"
-            >
-              {apartment.name}
-            </Link>
-          </h3>
-        </div>
-
-        <p className="text-ui text-cypress/80 line-clamp-3">
-          {apartment.description}
-        </p>
-
-        <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-cypress">
-          <li className="flex items-center gap-2">
-            <Users size={16} className="text-italian-green" />
-            do {apartment.maxGuests} {apartment.maxGuests === 1 ? "gościa" : "gości"}
-          </li>
-          <li className="flex items-center gap-2">
-            <BedDouble size={16} className="text-italian-green" />
-            {apartment.bedrooms} {apartment.bedrooms === 1 ? "sypialnia" : "sypialnie"}
-          </li>
-          <li className="flex items-center gap-2">
-            <Bath size={16} className="text-italian-green" />
-            {apartment.bathrooms} {apartment.bathrooms === 1 ? "łazienka" : "łazienki"}
-          </li>
-        </ul>
-
-        <div className="mt-auto flex flex-wrap gap-2 pt-2">
-          {apartment.amenities.slice(0, 4).map((amenity) => (
-            <span
-              key={amenity}
-              className="rounded-full bg-soft-green px-3 py-1 text-xs font-medium text-cypress"
-            >
-              {amenity}
+        <div className="relative aspect-[4/3] overflow-hidden bg-paper">
+          <Image
+            src={heroSrc}
+            alt={`Widok apartamentu ${apartment.name}`}
+            fill
+            unoptimized
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            sizes="(min-width: 768px) 50vw, 100vw"
+          />
+          {nextAvailability && (
+            <span className="absolute left-4 top-4 inline-flex items-center gap-2 border border-gold/50 bg-crema/90 px-3 py-1.5 text-xs font-display italic text-cypress shadow-warm backdrop-blur">
+              <span className="text-gold">·</span>
+              {nextAvailability}
             </span>
-          ))}
+          )}
         </div>
 
-        <div className="flex items-center justify-between border-t border-border pt-4">
-          <Link
-            href={`/apartments/${apartment.slug}`}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-italian-green hover:text-cypress"
-          >
-            Szczegóły i kalendarz
-            <ArrowRight size={16} />
-          </Link>
-          <Link
-            href={`/booking?apartmentId=${apartment.id}`}
-            className="rounded-full border border-italian-green/30 px-4 py-2 text-sm font-semibold text-italian-green transition-colors hover:bg-italian-green hover:text-flag-white"
-          >
-            Zapytaj o termin
-          </Link>
+        <div className="flex flex-col gap-5 p-7">
+          <div>
+            <p className="text-eyebrow text-gold">
+              {apartment.bedrooms === 1 ? "Per due" : "Per famiglia"}
+            </p>
+            <h3 className="heading-section mt-2 text-3xl text-ink transition-colors group-hover:text-terracotta md:text-4xl">
+              {apartment.name}
+            </h3>
+          </div>
+
+          <p className="text-ui line-clamp-3 text-cypress/80">
+            {apartment.description}
+          </p>
+
+          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-gold/20 pt-4 font-display italic text-cypress">
+            <li className="flex items-center gap-2 text-sm">
+              <Users size={14} className="text-olive" />
+              <span>
+                fino a <strong className="not-italic font-medium">{apartment.maxGuests}</strong>{" "}
+                {apartment.maxGuests === 1 ? "ospite" : "ospiti"}
+              </span>
+            </li>
+            <li className="flex items-center gap-2 text-sm">
+              <BedDouble size={14} className="text-olive" />
+              <span>
+                <strong className="not-italic font-medium">{apartment.bedrooms}</strong>{" "}
+                {apartment.bedrooms === 1 ? "camera" : "camere"}
+              </span>
+            </li>
+            <li className="flex items-center gap-2 text-sm">
+              <Bath size={14} className="text-olive" />
+              <span>
+                <strong className="not-italic font-medium">{apartment.bathrooms}</strong>{" "}
+                {apartment.bathrooms === 1 ? "bagno" : "bagni"}
+              </span>
+            </li>
+          </ul>
+
+          {apartment.amenities.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {apartment.amenities.slice(0, 4).map((amenity) => (
+                <span
+                  key={amenity}
+                  className="border border-gold/30 px-3 py-1 text-[11px] uppercase tracking-wider text-stone"
+                >
+                  {amenity}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="flex items-center justify-between border-t border-gold/20 pt-4">
+            <span className="link-italic font-display italic text-terracotta">
+              Dettagli e calendario
+            </span>
+            <ArrowRight size={16} className="text-terracotta transition-transform group-hover:translate-x-1" />
+          </div>
         </div>
-      </div>
+      </Link>
     </article>
   );
 }
