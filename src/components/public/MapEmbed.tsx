@@ -1,11 +1,15 @@
 /**
  * MapEmbed — Google Maps integration for restaurants/attractions.
  *
- * - With NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY + (placeId or latlng): renders
- *   a Maps Embed iframe.
- * - Without the key but with coords: shows a "Otwórz w Google Maps" link
- *   built from `https://www.google.com/maps/search/?api=1&query=lat,lng`.
- * - Without any Map_Data: shows just the address text.
+ * Strategia (od najlepszego do najgorszego):
+ *   1. Klucz + lat/lng        → embed `/view` z koordynatami (najpewniejsze)
+ *   2. Klucz + adres           → embed `/place?q=<adres>` (działa dla Orte itp.)
+ *   3. Klucz + placeId         → embed `/place?q=place_id:...` (tylko jeśli adres puste)
+ *   4. Brak klucza             → tylko link „Otwórz w Google Maps"
+ *
+ * Powód kolejności: w bazie często jest fałszywy `place_id` z seedu który
+ * Google odrzuca jako "Invalid 'q' parameter". `lat/lng` zawsze działa,
+ * adres tekstowy też — `place_id` jako ostatnia opcja.
  *
  * Wymagania pokryte: 41.
  */
@@ -22,26 +26,43 @@ interface MapEmbedProps {
 }
 
 function buildEmbedUrl(props: MapEmbedProps, key: string): string | null {
-  if (props.placeId) {
-    return `https://www.google.com/maps/embed/v1/place?key=${key}&q=place_id:${props.placeId}`;
-  }
-  if (props.latitude !== null && props.latitude !== undefined && props.longitude !== null && props.longitude !== undefined) {
+  // 1. lat/lng — najpewniejsze, zawsze działa
+  if (
+    props.latitude !== null &&
+    props.latitude !== undefined &&
+    props.longitude !== null &&
+    props.longitude !== undefined
+  ) {
     return `https://www.google.com/maps/embed/v1/view?key=${key}&center=${props.latitude},${props.longitude}&zoom=16`;
+  }
+  // 2. Adres tekstowy — działa dla większości realnych adresów
+  if (props.address && props.address.trim().length > 0) {
+    const q = encodeURIComponent(props.address);
+    return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${q}`;
+  }
+  // 3. placeId — ostatni resort, często fałszywy w seedzie
+  if (props.placeId && props.placeId.startsWith('ChIJ')) {
+    return `https://www.google.com/maps/embed/v1/place?key=${key}&q=place_id:${props.placeId}`;
   }
   return null;
 }
 
 function buildSearchUrl(props: MapEmbedProps): string | null {
   if (props.mapsUrl) return props.mapsUrl;
-  if (props.placeId) {
-    const q = props.address ?? props.name ?? '';
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}&query_place_id=${props.placeId}`;
-  }
-  if (props.latitude !== null && props.latitude !== undefined && props.longitude !== null && props.longitude !== undefined) {
+  if (
+    props.latitude !== null &&
+    props.latitude !== undefined &&
+    props.longitude !== null &&
+    props.longitude !== undefined
+  ) {
     return `https://www.google.com/maps/search/?api=1&query=${props.latitude},${props.longitude}`;
   }
   if (props.address) {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(props.address)}`;
+  }
+  if (props.placeId && props.placeId.startsWith('ChIJ')) {
+    const q = props.address ?? props.name ?? '';
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}&query_place_id=${props.placeId}`;
   }
   return null;
 }
@@ -64,7 +85,18 @@ export function MapEmbed(props: MapEmbedProps) {
             className="absolute inset-0 h-full w-full border-0"
           />
         </div>
-      ) : null}
+      ) : (
+        // Brak danych dla embed (np. tylko fałszywy placeId) — pokazujemy
+        // tylko adres + link, bez czarnego prostokąta z błędem.
+        <div className="flex aspect-video items-center justify-center bg-paper px-6 text-center">
+          <div className="space-y-3">
+            <MapPin size={28} className="mx-auto text-gold" />
+            <p className="font-display italic text-stone">
+              {props.address ?? 'Lokalizacja dostępna w Google Maps'}
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col gap-2 p-4 text-sm text-cypress sm:flex-row sm:items-center sm:justify-between">
         {props.address ? (
