@@ -81,8 +81,6 @@ interface MonthCell {
 
 export function AvailabilityCalendar({
   apartmentId,
-  apartmentSlug: _apartmentSlug,
-  apartmentMaxGuests: _apartmentMaxGuests,
   initialMonths = 3,
 }: AvailabilityCalendarProps) {
   const router = useRouter();

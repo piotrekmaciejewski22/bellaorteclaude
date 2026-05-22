@@ -9,6 +9,7 @@ export interface BlogCommentPayload {
   signature?: unknown;
   body?: unknown;
   consent?: unknown;
+  website?: unknown; // honeypot — powinno być puste
 }
 
 export interface ValidationError {
@@ -25,6 +26,15 @@ const UUID_RE =
 
 export function validateBlogComment(payload: BlogCommentPayload): ValidationResult {
   const errors: ValidationError[] = [];
+
+  // Honeypot — pole ukryte; ludzie nigdy nie wypełnią. Boty często tak.
+  // Zwracamy pojedynczy generyczny błąd, by nie ujawniać że to honeypot.
+  if (typeof payload.website === 'string' && payload.website.trim().length > 0) {
+    return {
+      ok: false,
+      errors: [{ field: 'body', message: 'Nie udało się wysłać. Spróbuj ponownie.' }],
+    };
+  }
 
   if (typeof payload.postId !== 'string' || !UUID_RE.test(payload.postId)) {
     errors.push({ field: 'postId', message: 'Nieprawidłowy identyfikator wpisu' });

@@ -335,11 +335,13 @@ export default async function HomePage() {
                     key={photo.id}
                     className="group relative aspect-square overflow-hidden border border-gold/20"
                   >
-                    <img
+                    <Image
                       src={photo.signedUrl}
                       alt={photo.caption || "Zdjęcie od gości"}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      fill
+                      unoptimized
+                      sizes="(min-width: 1024px) 16vw, (min-width: 640px) 33vw, 50vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </li>
                 ))}
@@ -379,7 +381,7 @@ export default async function HomePage() {
                 <span className="mt-1 h-2 w-2 rounded-full bg-olive" />
                 <div>
                   <p className="font-display text-lg text-ink">Bomarzo i Civita di Bagnoregio</p>
-                  <p className="text-sm text-cypress/75">25 i 50 minut autem — Park Potworów i „umierające miasto".</p>
+                  <p className="text-sm text-cypress/75">25 i 50 minut autem — Park Potworów i „umierające miasto”.</p>
                 </div>
               </li>
               <li className="flex items-start gap-4">

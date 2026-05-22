@@ -18,6 +18,9 @@ export function CommentForm({ postId, consentText }: CommentFormProps) {
   const [signature, setSignature] = useState('');
   const [body, setBody] = useState('');
   const [consent, setConsent] = useState(false);
+  // Honeypot — pole ukryte przed użytkownikami, ale boty często wypełniają
+  // wszystkie pola formularza. Jeśli wartość jest niepusta — odrzucamy.
+  const [website, setWebsite] = useState('');
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [serverError, setServerError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -32,7 +35,7 @@ export function CommentForm({ postId, consentText }: CommentFormProps) {
     setServerError(null);
     setSuccess(false);
 
-    const payload = { postId, signature, body, consent };
+    const payload = { postId, signature, body, consent, website };
     const result = validateBlogComment(payload);
     if (!result.ok) {
       setErrors(result.errors);
@@ -69,6 +72,7 @@ export function CommentForm({ postId, consentText }: CommentFormProps) {
       setSignature('');
       setBody('');
       setConsent(false);
+      setWebsite('');
       router.refresh();
     } catch {
       setServerError('Brak połączenia.');
@@ -79,6 +83,21 @@ export function CommentForm({ postId, consentText }: CommentFormProps) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-flag-white p-5">
+      {/* Honeypot — niewidoczne dla ludzi, ale widoczne dla botów. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden" tabIndex={-1}>
+        <label htmlFor="comment-website-trap">
+          Strona internetowa (zostaw puste)
+          <input
+            id="comment-website-trap"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+          />
+        </label>
+      </div>
+
       <div>
         <label htmlFor="comment-signature" className="block text-sm font-medium text-cypress">
           Twój podpis

@@ -6,6 +6,7 @@
 
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
 
 import { MapEmbed } from '@/components/public/MapEmbed';
@@ -169,11 +170,16 @@ export default async function AttractionDetailPage({ params }: PageProps) {
                       key={photo.id}
                       className="overflow-hidden rounded-xl border border-border bg-flag-white"
                     >
-                      <img
-                        src={photo.signedUrl}
-                        alt="Zdjęcie od gościa"
-                        className="aspect-square w-full object-cover"
-                      />
+                      <div className="relative aspect-square w-full">
+                        <Image
+                          src={photo.signedUrl}
+                          alt="Zdjęcie od gościa"
+                          fill
+                          unoptimized
+                          sizes="(min-width: 768px) 33vw, 50vw"
+                          className="object-cover"
+                        />
+                      </div>
                     </li>
                   ))}
                 </ul>

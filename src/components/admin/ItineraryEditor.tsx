@@ -42,7 +42,7 @@ export function ItineraryEditor({
 }: ItineraryEditorProps) {
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
-  const [infoSections, setInfoSections] = useState(initialInfo);
+  const [infoSections] = useState(initialInfo);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

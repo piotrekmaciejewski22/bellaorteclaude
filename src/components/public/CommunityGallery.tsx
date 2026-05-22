@@ -5,6 +5,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface CommunityPhoto {
@@ -63,11 +64,14 @@ export function CommunityGallery({ photos }: CommunityGalleryProps) {
             onClick={() => setOpenIndex(index)}
             className="group mb-3 block w-full overflow-hidden rounded-xl border border-border bg-flag-white text-left focus-visible:outline-2 focus-visible:outline-italian-green"
           >
-            <img
+            <Image
               src={photo.signedUrl}
               alt={photo.caption || 'Zdjęcie od gości'}
-              loading="lazy"
-              className="block w-full transition-transform duration-500 group-hover:scale-105"
+              width={800}
+              height={1067}
+              unoptimized
+              sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
+              className="block h-auto w-full transition-transform duration-500 group-hover:scale-105"
             />
             <div className="p-3 text-xs">
               {photo.locationLabel && (
@@ -130,9 +134,12 @@ export function CommunityGallery({ photos }: CommunityGalleryProps) {
             className="flex max-h-[88vh] max-w-5xl flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
+            <Image
               src={photos[openIndex].signedUrl}
               alt={photos[openIndex].caption || 'Zdjęcie od gości'}
+              width={1600}
+              height={1200}
+              unoptimized
               className="max-h-[80vh] w-auto rounded-lg object-contain"
             />
             <figcaption className="mt-3 text-center text-sm text-ivory/90">

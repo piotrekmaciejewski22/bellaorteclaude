@@ -102,7 +102,7 @@ export function HeroSection({ imageUrl }: HeroSectionProps = {}) {
               <p className="mt-1 text-eyebrow">Apartamenty</p>
             </li>
             <li>
-              <p className="font-display text-4xl text-olive md:text-5xl">60'</p>
+              <p className="font-display text-4xl text-olive md:text-5xl">60&apos;</p>
               <p className="mt-1 text-eyebrow">Pociąg do Rzymu</p>
             </li>
             <li>

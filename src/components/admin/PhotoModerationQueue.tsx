@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface PhotoRow {
   id: string;
@@ -119,11 +120,16 @@ export function PhotoModerationQueue({
               className="overflow-hidden rounded-2xl border border-border bg-flag-white"
             >
               {row.signedUrl ? (
-                <img
-                  src={row.signedUrl}
-                  alt={`Zdjęcie do moderacji (${row.targetName})`}
-                  className="aspect-square w-full object-cover"
-                />
+                <div className="relative aspect-square w-full">
+                  <Image
+                    src={row.signedUrl}
+                    alt={`Zdjęcie do moderacji (${row.targetName})`}
+                    fill
+                    unoptimized
+                    sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 <div className="flex aspect-square items-center justify-center bg-muted/15 text-xs text-muted">
                   Podgląd niedostępny

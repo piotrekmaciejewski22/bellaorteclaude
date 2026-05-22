@@ -33,11 +33,6 @@ const supabase = createClient(SUPABASE_URL, SERVICE_KEY, {
 
 const PHOTO_DIR = path.resolve(process.cwd(), 'scripts/blog-photos');
 
-interface PhotoUpload {
-  filename: string;
-  storagePath: string;
-}
-
 async function uploadPhoto(filename: string): Promise<string> {
   const localPath = path.join(PHOTO_DIR, filename);
   if (!existsSync(localPath)) {

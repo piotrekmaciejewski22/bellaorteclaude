@@ -35,9 +35,33 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "BELLAORTE — Apartamenty w sercu Tuscia, godzinę od Rzymu",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bellaorte.example',
+  ),
+  title: {
+    default: 'BELLAORTE — Apartamenty w sercu Tuscia, godzinę od Rzymu',
+    template: '%s · Bellaorte',
+  },
   description:
-    "Dwa kameralne apartamenty w zabytkowym Orte. Spokój doliny Tybru, sąsiedztwo Bomarzo i Civita di Bagnoregio, bezpośredni pociąg do Rzymu. Bez płatności online — kontakt mailowy.",
+    'Dwa kameralne apartamenty w zabytkowym Orte. Spokój doliny Tybru, sąsiedztwo Bomarzo i Civita di Bagnoregio, bezpośredni pociąg do Rzymu. Bez płatności online — kontakt mailowy.',
+  openGraph: {
+    type: 'website',
+    locale: 'pl_PL',
+    siteName: 'Bellaorte',
+    title: 'BELLAORTE — Apartamenty w sercu Tuscia',
+    description:
+      'Dwa kameralne apartamenty w zabytkowym Orte. Godzina pociągiem do Rzymu, spokój doliny Tybru.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'BELLAORTE — Apartamenty w sercu Tuscia',
+    description:
+      'Dwa kameralne apartamenty w zabytkowym Orte. Godzina pociągiem do Rzymu.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

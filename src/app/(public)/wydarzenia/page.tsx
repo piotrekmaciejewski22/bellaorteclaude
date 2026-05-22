@@ -7,6 +7,8 @@ import ReactMarkdown from 'react-markdown';
 import { SectionDivider } from '@/components/public/decorative/SectionDivider';
 import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
 import { TuscanSunIcon } from '@/components/public/decorative/ItalianIcons';
+import { EventsCalendar } from '@/components/public/EventsCalendar';
+import { EventsViewToggle } from '@/components/public/EventsViewToggle';
 import { createServerClient } from '@/lib/supabase/server';
 import { getEvents } from '@/lib/data/events';
 import { publicSiteMediaUrl } from '@/lib/data/apartments';
@@ -66,6 +68,23 @@ export default async function WydarzeniaPage() {
           festas, koncerty — i co polecamy w danym sezonie roku.
         </p>
 
+        {(localEvents.length > 0 || seasonalEvents.length > 0) && (
+          <div className="mt-8">
+            <EventsViewToggle />
+          </div>
+        )}
+
+        {/* WIDOK KALENDARZA — chowany domyślnie, pokazywany przez toggler. */}
+        {(localEvents.length > 0 || seasonalEvents.length > 0) && (
+          <div data-events-view="calendar" className="mt-8">
+            <EventsCalendar
+              localEvents={localEvents}
+              seasonalEvents={seasonalEvents}
+            />
+          </div>
+        )}
+
+        <div data-events-view="list">
         {localEvents.length > 0 && (
           <>
             <SectionDivider motto="le feste di stagione" />
@@ -175,6 +194,7 @@ export default async function WydarzeniaPage() {
             uzupełnieniu w panelu.
           </p>
         )}
+        </div>
       </div>
     </div>
   );
