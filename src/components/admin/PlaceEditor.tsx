@@ -11,9 +11,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 import { validateRestaurant } from '@/lib/validation/restaurant';
 import { validateAttraction } from '@/lib/validation/attraction';
+import { parseMapsUrl, isShortMapsUrl } from '@/lib/geo/parse-maps-url';
 import type { Attraction, Restaurant } from '@/lib/types';
 
 type EditorMode =
@@ -53,6 +55,37 @@ export function PlaceEditor({ mode }: PlaceEditorProps) {
   );
   const [mapsUrl, setMapsUrl] = useState(initial?.mapsUrl ?? '');
   const [published, setPublished] = useState<boolean>(initial?.publishedAt !== null && initial?.publishedAt !== undefined);
+
+  // Stan dla pola „Wklej link z Google Maps"
+  const [pasteUrl, setPasteUrl] = useState('');
+  const [pasteFeedback, setPasteFeedback] = useState<
+    | { kind: 'success'; lat: number; lng: number }
+    | { kind: 'short' }
+    | { kind: 'invalid' }
+    | null
+  >(null);
+
+  function handlePasteUrl(input: string) {
+    setPasteUrl(input);
+    if (!input.trim()) {
+      setPasteFeedback(null);
+      return;
+    }
+    if (isShortMapsUrl(input)) {
+      setPasteFeedback({ kind: 'short' });
+      return;
+    }
+    const parsed = parseMapsUrl(input);
+    if (!parsed) {
+      setPasteFeedback({ kind: 'invalid' });
+      return;
+    }
+    // Auto-wypełnienie pól
+    setLatitude(String(parsed.latitude));
+    setLongitude(String(parsed.longitude));
+    setMapsUrl(parsed.cleanUrl);
+    setPasteFeedback({ kind: 'success', lat: parsed.latitude, lng: parsed.longitude });
+  }
 
   // Restaurant-only
   const r = isRestaurant ? (initial as Restaurant | undefined) : undefined;
@@ -404,6 +437,51 @@ export function PlaceEditor({ mode }: PlaceEditorProps) {
             className="mt-1 w-full rounded-lg border border-border bg-ivory px-3 py-2 font-mono text-sm text-ink"
           />
           {fieldError('placeId') && <p className="mt-1 text-xs text-italian-red">{fieldError('placeId')}</p>}
+        </div>
+
+        {/* Pole „Wklej link z Google Maps" — auto-uzupełnia lat/lng/mapsUrl. */}
+        <div className="rounded-xl border border-italian-green/30 bg-soft-green/30 p-4">
+          <label htmlFor="pasteMapsUrl" className="flex items-center gap-2 text-sm font-medium text-cypress">
+            <Sparkles size={14} className="text-italian-green" />
+            Wklej link z Google Maps
+          </label>
+          <p className="mt-1 text-xs text-cypress/80">
+            Otwórz miejsce w Google Maps, skopiuj URL z przeglądarki (np. zaczynający się od{' '}
+            <code className="rounded bg-flag-white px-1 font-mono">https://www.google.com/maps/place/…</code>
+            ) i wklej tutaj. Współrzędne wypełnimy automatycznie.
+          </p>
+          <input
+            id="pasteMapsUrl"
+            type="url"
+            value={pasteUrl}
+            onChange={(e) => handlePasteUrl(e.target.value)}
+            placeholder="https://www.google.com/maps/place/..."
+            className="mt-2 w-full rounded-lg border border-border bg-flag-white px-3 py-2 text-sm text-ink"
+          />
+          {pasteFeedback?.kind === 'success' && (
+            <p className="mt-2 inline-flex items-center gap-1 text-xs text-italian-green">
+              <CheckCircle2 size={12} />
+              Współrzędne wypełnione: {pasteFeedback.lat.toFixed(5)}, {pasteFeedback.lng.toFixed(5)}
+            </p>
+          )}
+          {pasteFeedback?.kind === 'short' && (
+            <p className="mt-2 inline-flex items-start gap-1 text-xs text-terracotta">
+              <AlertCircle size={12} className="mt-0.5 shrink-0" />
+              <span>
+                To skrócony link (goo.gl). Kliknij w niego, otworzy się Google Maps —
+                potem skopiuj pełen URL z paska adresu i wklej tutaj.
+              </span>
+            </p>
+          )}
+          {pasteFeedback?.kind === 'invalid' && (
+            <p className="mt-2 inline-flex items-start gap-1 text-xs text-italian-red">
+              <AlertCircle size={12} className="mt-0.5 shrink-0" />
+              <span>
+                Nie znalazłem współrzędnych w tym linku. Upewnij się, że to URL z Google Maps
+                z klikniętym pinem (zwykle zawiera <code>@lat,lng,zoom</code>).
+              </span>
+            </p>
+          )}
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
