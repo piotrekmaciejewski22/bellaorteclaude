@@ -3,7 +3,6 @@ export const dynamic = 'force-dynamic';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import ReactMarkdown from 'react-markdown';
 import { ArrowLeft } from 'lucide-react';
 
 import { SectionDivider } from '@/components/public/decorative/SectionDivider';
@@ -14,6 +13,7 @@ import { getBlogPostBySlug, getApprovedComments } from '@/lib/data/blog';
 import { getSiteSettings } from '@/lib/data/settings';
 import { publicSiteMediaUrl } from '@/lib/data/apartments';
 import { CommentForm } from '@/components/public/CommentForm';
+import { PostBody } from '@/components/public/PostBody';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -95,8 +95,8 @@ export default async function BlogPostPage({ params }: PageProps) {
           </div>
         )}
 
-        <div className="markdown-body mt-12">
-          <ReactMarkdown>{post.bodyMd || post.excerpt}</ReactMarkdown>
+        <div className="mt-12">
+          <PostBody content={post.bodyMd || post.excerpt} />
         </div>
 
         <SectionDivider motto="conversazione" />

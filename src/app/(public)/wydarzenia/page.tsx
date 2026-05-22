@@ -2,13 +2,13 @@ export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
 
 import { SectionDivider } from '@/components/public/decorative/SectionDivider';
 import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
 import { TuscanSunIcon } from '@/components/public/decorative/ItalianIcons';
 import { EventsCalendar } from '@/components/public/EventsCalendar';
 import { EventsViewToggle } from '@/components/public/EventsViewToggle';
+import { PostBody } from '@/components/public/PostBody';
 import { createServerClient } from '@/lib/supabase/server';
 import { getEvents } from '@/lib/data/events';
 import { publicSiteMediaUrl } from '@/lib/data/apartments';
@@ -122,8 +122,8 @@ export default async function WydarzeniaPage() {
                           <p className="text-ui mt-3 text-cypress/85">{e.excerpt}</p>
                         )}
                         {e.bodyMd && (
-                          <div className="markdown-body mt-4 text-sm">
-                            <ReactMarkdown>{e.bodyMd}</ReactMarkdown>
+                          <div className="mt-4 text-sm">
+                            <PostBody content={e.bodyMd} />
                           </div>
                         )}
                         {e.externalUrl && (
@@ -176,8 +176,8 @@ export default async function WydarzeniaPage() {
                         <p className="text-ui mt-3 text-sm text-cypress/85">{e.excerpt}</p>
                       )}
                       {e.bodyMd && (
-                        <div className="markdown-body mt-4 flex-1 text-sm">
-                          <ReactMarkdown>{e.bodyMd}</ReactMarkdown>
+                        <div className="mt-4 flex-1 text-sm">
+                          <PostBody content={e.bodyMd} />
                         </div>
                       )}
                     </article>

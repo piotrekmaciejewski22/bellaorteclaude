@@ -309,4 +309,11 @@ body {
     margin: 0.3rem 0.6rem 0 0;
     color: var(--color-terracotta);
   }
+
+  /* Tiptap zapisuje text-align jako style inline + atrybut na elemencie.
+     Honorujemy to w renderowanym HTML. */
+  .markdown-body [style*="text-align: center"] { text-align: center; }
+  .markdown-body [style*="text-align: right"] { text-align: right; }
+  .markdown-body [style*="text-align: left"] { text-align: left; }
+  .markdown-body u { text-decoration: underline; }
 }

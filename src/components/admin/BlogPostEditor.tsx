@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Trash2, Upload } from 'lucide-react';
 
 import type { BlogPost } from '@/lib/data/blog';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
 
 interface BlogPostEditorProps {
   post?: BlogPost;
@@ -60,8 +61,31 @@ export function BlogPostEditor({ post, heroUrl }: BlogPostEditorProps) {
       setHeroPath(data.path);
       setCurrentHeroUrl(data.url);
       setHeroFile(null);
+
+      // Auto-zapis przy edycji istniejącego posta — żeby zdjęcie nie znikło
+      // przy odświeżeniu strony przed kliknięciem "Zapisz zmiany".
+      if (post) {
+        await fetch(`/api/admin/blog/${post.id}`, {
+          method: 'PATCH',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ heroImagePath: data.path }),
+        });
+      }
     } finally {
       setUploadingHero(false);
+    }
+  }
+
+  async function removeHero() {
+    setHeroPath(null);
+    setCurrentHeroUrl(null);
+    // Auto-zapis usunięcia przy edycji istniejącego posta.
+    if (post) {
+      await fetch(`/api/admin/blog/${post.id}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ heroImagePath: null }),
+      });
     }
   }
 
@@ -155,8 +179,13 @@ export function BlogPostEditor({ post, heroUrl }: BlogPostEditorProps) {
         </div>
 
         <div>
-          <label htmlFor="bodyMd" className="block text-sm font-medium text-cypress">Treść (Markdown)</label>
-          <textarea id="bodyMd" rows={14} value={bodyMd} onChange={(e) => setBodyMd(e.target.value)} className="mt-1 w-full rounded-lg border border-border bg-ivory px-3 py-2 font-mono text-sm text-ink" />
+          <label htmlFor="bodyMd" className="block text-sm font-medium text-cypress">Treść wpisu</label>
+          <div className="mt-1">
+            <RichTextEditor value={bodyMd} onChange={setBodyMd} rows={14} placeholder="Pisz tutaj…" />
+          </div>
+          <p className="mt-1 text-xs text-muted">
+            Użyj toolbara — pogrubienie, kursywa, nagłówki, listy, linki, kolory.
+          </p>
         </div>
 
         <div>
@@ -179,10 +208,7 @@ export function BlogPostEditor({ post, heroUrl }: BlogPostEditorProps) {
             </div>
             <button
               type="button"
-              onClick={() => {
-                setHeroPath(null);
-                setCurrentHeroUrl(null);
-              }}
+              onClick={removeHero}
               className="inline-flex items-center gap-1 text-xs text-italian-red hover:underline"
             >
               <Trash2 size={12} /> Usuń zdjęcie z wpisu

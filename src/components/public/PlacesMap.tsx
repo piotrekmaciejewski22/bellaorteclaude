@@ -1,17 +1,16 @@
 "use client";
 
 /**
- * PlacesMap — interaktywna mapa wszystkich miejsc.
+ * PlacesMap — interaktywna mapa wszystkich miejsc oparta na Leaflet
+ * z kafelkami OpenStreetMap (darmowe, bez klucza API). Wygląda jak
+ * Google Maps z drogami, nazwami miast i terenu.
  *
- * Bez Google Maps API używamy stylizowanej mapy SVG z pinami pozycjonowanymi
- * proporcjonalnie do współrzędnych. Pełnowartościowy iframe Google Maps
- * (zbiorczy) ładujemy przez `<MapEmbed>` jeśli klucz jest dostępny.
- *
- * Kliknięcie pina otwiera boczny panel z szczegółami i linkiem do strony
- * danego miejsca.
+ * Filtry po typie i regionie (Okolica Orte / Rzym) + boczna lista
+ * wyboru. Klik w pin lub element listy otwiera popup ze szczegółami.
  */
 
 import { useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Filter, MapPin, X, ExternalLink } from 'lucide-react';
 
@@ -36,16 +35,16 @@ interface PlacesMapProps {
   places: Place[];
 }
 
-const TYPE_COLORS: Record<Place['type'], string> = {
-  apartment: 'fill-italian-red text-italian-red',
-  restaurant: 'fill-terracotta text-terracotta',
-  attraction: 'fill-olive text-olive',
-};
-
 const TYPE_LABEL: Record<Place['type'], string> = {
   apartment: 'Apartamenty',
   restaurant: 'Restauracje',
   attraction: 'Atrakcje',
+};
+
+const TYPE_COLOR: Record<Place['type'], string> = {
+  apartment: '#9b2c2c',
+  restaurant: '#b85c38',
+  attraction: '#5b6342',
 };
 
 const TYPE_HREF: Record<Place['type'], (slug: string) => string> = {
@@ -60,10 +59,33 @@ const TYPE_ICON: Record<Place['type'], React.ComponentType<{ size?: number; clas
   attraction: CypressIcon,
 };
 
+// Mapy ładujemy lazy bo wymagają window. Wybór silnika:
+//   - jeśli ustawiony NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY → Google Maps
+//   - inaczej fallback Leaflet/OpenStreetMap (darmowe, bez klucza)
+const GoogleMap = dynamic(() => import('./GoogleMap').then((m) => m.GoogleMap), {
+  ssr: false,
+  loading: () => (
+    <div className="flex aspect-[4/3] items-center justify-center bg-paper text-stone">
+      <p className="font-display italic">Ładowanie mapy…</p>
+    </div>
+  ),
+});
+
+const LeafletMap = dynamic(() => import('./LeafletMap').then((m) => m.LeafletMap), {
+  ssr: false,
+  loading: () => (
+    <div className="flex aspect-[4/3] items-center justify-center bg-paper text-stone">
+      <p className="font-display italic">Ładowanie mapy…</p>
+    </div>
+  ),
+});
+
 export function PlacesMap({ places }: PlacesMapProps) {
   const [filterType, setFilterType] = useState<'all' | Place['type']>('all');
   const [filterRegion, setFilterRegion] = useState<'all' | Place['region']>('all');
-  const [activePlace, setActivePlace] = useState<Place | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
 
   const filtered = useMemo(() => {
     return places.filter((p) => {
@@ -73,34 +95,7 @@ export function PlacesMap({ places }: PlacesMapProps) {
     });
   }, [places, filterType, filterRegion]);
 
-  // Bounding box dla mapy. Włochy/Lazio + Rzym mieści się w tych granicach.
-  const BOUNDS = useMemo(() => {
-    if (filtered.length === 0) {
-      return { minLat: 41.85, maxLat: 42.7, minLng: 12.0, maxLng: 12.55 };
-    }
-    const lats = filtered.map((p) => p.latitude);
-    const lngs = filtered.map((p) => p.longitude);
-    const minLat = Math.min(...lats);
-    const maxLat = Math.max(...lats);
-    const minLng = Math.min(...lngs);
-    const maxLng = Math.max(...lngs);
-    // Margines 10%
-    const padLat = (maxLat - minLat) * 0.1 || 0.05;
-    const padLng = (maxLng - minLng) * 0.1 || 0.05;
-    return {
-      minLat: minLat - padLat,
-      maxLat: maxLat + padLat,
-      minLng: minLng - padLng,
-      maxLng: maxLng + padLng,
-    };
-  }, [filtered]);
-
-  function project(p: Place): { x: number; y: number } {
-    const x = ((p.longitude - BOUNDS.minLng) / (BOUNDS.maxLng - BOUNDS.minLng)) * 100;
-    // Y odwrotnie — wyższa lat = bardziej północ = mniejsze y w SVG
-    const y = ((BOUNDS.maxLat - p.latitude) / (BOUNDS.maxLat - BOUNDS.minLat)) * 100;
-    return { x, y };
-  }
+  const activePlace = activeId ? filtered.find((p) => p.id === activeId) ?? null : null;
 
   return (
     <div>
@@ -158,12 +153,12 @@ export function PlacesMap({ places }: PlacesMapProps) {
                   <li key={p.id}>
                     <button
                       type="button"
-                      onClick={() => setActivePlace(p)}
+                      onClick={() => setActiveId(p.id)}
                       className={`flex w-full items-start gap-3 border-b border-gold/20 p-4 text-left transition-colors hover:bg-paper/50 ${
-                        activePlace?.id === p.id ? 'bg-paper' : ''
+                        activeId === p.id ? 'bg-paper' : ''
                       }`}
                     >
-                      <span className={`mt-1 ${TYPE_COLORS[p.type].split(' ')[1]}`}>
+                      <span style={{ color: TYPE_COLOR[p.type] }} className="mt-1">
                         <Icon size={20} />
                       </span>
                       <div>
@@ -186,57 +181,22 @@ export function PlacesMap({ places }: PlacesMapProps) {
         {/* Mapa po prawej */}
         <div className="relative">
           <div aria-hidden="true" className="absolute -inset-3 -z-10 border border-gold/40" />
-          <div className="relative aspect-[4/3] overflow-hidden bg-paper">
-            <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" className="h-full w-full">
-              {/* Pseudo-rzeka Tyber */}
-              <path
-                d="M 8 18 Q 20 30, 32 38 Q 44 48, 52 58 Q 62 70, 80 78"
-                stroke="rgba(143, 179, 200, 0.6)"
-                strokeWidth="0.7"
-                fill="none"
-              />
-
-              {/* Linia kolejowa Orte → Roma */}
-              <path
-                d="M 38 32 L 76 70"
-                stroke="rgba(176, 138, 62, 0.5)"
-                strokeWidth="0.4"
-                strokeDasharray="1 1.5"
-                fill="none"
-              />
-
-              {/* Piny */}
-              {filtered.map((p) => {
-                const { x, y } = project(p);
-                const isActive = activePlace?.id === p.id;
-                const colorClass = TYPE_COLORS[p.type].split(' ')[0];
-                return (
-                  <g
-                    key={p.id}
-                    transform={`translate(${x} ${y})`}
-                    onClick={() => setActivePlace(p)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {isActive && (
-                      <circle
-                        r="4"
-                        className={colorClass}
-                        opacity="0.25"
-                      />
-                    )}
-                    <circle
-                      r={isActive ? 1.8 : 1.3}
-                      className={colorClass}
-                    />
-                  </g>
-                );
-              })}
-            </svg>
-          </div>
-
-          <p className="mt-3 text-center font-display text-xs italic text-stone">
-            Schematyczna mapa — kliknij pin lub element listy żeby zobaczyć detale
-          </p>
+          {googleApiKey ? (
+            <GoogleMap
+              places={filtered}
+              activeId={activeId}
+              onSelect={(id) => setActiveId(id)}
+              typeColor={TYPE_COLOR}
+              apiKey={googleApiKey}
+            />
+          ) : (
+            <LeafletMap
+              places={filtered}
+              activeId={activeId}
+              onSelect={(id) => setActiveId(id)}
+              typeColor={TYPE_COLOR}
+            />
+          )}
         </div>
       </div>
 
@@ -259,7 +219,7 @@ export function PlacesMap({ places }: PlacesMapProps) {
             </div>
             <button
               type="button"
-              onClick={() => setActivePlace(null)}
+              onClick={() => setActiveId(null)}
               aria-label="Zamknij szczegóły"
               className="text-stone hover:text-cypress"
             >
