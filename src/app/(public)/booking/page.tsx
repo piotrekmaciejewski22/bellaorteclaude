@@ -1,13 +1,8 @@
-/**
- * `/booking` — public Booking_Form page.
- *
- * Server Component. Loads apartments (Supabase or mock), reads pre-select
- * params from the query string, renders the client `BookingForm`.
- *
- * Wymagania pokryte: 9.
- */
+export const dynamic = 'force-dynamic';
 
 import { BookingForm } from '@/components/public/BookingForm';
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
 import { MOCK_APARTMENTS } from '@/lib/mock-data';
 import { getApartments } from '@/lib/data/apartments';
 import { createServerClient } from '@/lib/supabase/server';
@@ -66,18 +61,26 @@ export default async function BookingPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <div className="mx-auto max-w-3xl px-6 py-16">
-        <p className="text-eyebrow">Rezerwacja</p>
-        <h1 className="heading-display mt-2 text-4xl text-ink md:text-5xl">
-          Wyślij zapytanie o termin
+        <div className="flex items-center gap-3">
+          <span className="text-eyebrow text-gold">Rezerwacja</span>
+          <TricoloreRule size="md" />
+        </div>
+
+        <h1 className="heading-display mt-5 text-4xl text-ink md:text-6xl">
+          Wyślij <span className="italic text-olive">zapytanie</span>
         </h1>
-        <p className="text-ui mt-4 max-w-2xl text-cypress/80">
+        <p className="text-motto mt-3 text-lg md:text-xl">— prenotare il soggiorno —</p>
+
+        <p className="text-ui mt-6 max-w-2xl text-cypress/85">
           Bez płatności online. Po wysłaniu zapytania odpowiemy ręcznie mailem
           z potwierdzeniem dostępności i instrukcją zameldowania.
         </p>
 
-        <div className="mt-8 rounded-2xl border border-border bg-flag-white p-6 md:p-8">
+        <SectionDivider motto="vi aspettiamo" />
+
+        <div className="border border-gold/30 bg-flag-white p-6 shadow-warm md:p-10">
           <BookingForm
             apartments={apartments}
             preselectedApartmentId={params.apartmentId}

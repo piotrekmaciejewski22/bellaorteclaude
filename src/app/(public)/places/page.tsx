@@ -1,12 +1,9 @@
 export const dynamic = 'force-dynamic';
 
-/**
- * `/places` — list of attractions in `orte_area`.
- *
- * Wymagania pokryte: 16.
- */
-
 import { PlaceCard } from '@/components/public/PlaceCard';
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
+import { CypressIcon } from '@/components/public/decorative/ItalianIcons';
 import { createServerClient } from '@/lib/supabase/server';
 import { getAttractions } from '@/lib/data/attractions';
 import { getAttractionReviewStats } from '@/lib/data/review-stats';
@@ -41,21 +38,34 @@ export default async function PlacesPage() {
   }
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <p className="text-eyebrow">Przewodnik · Atrakcje</p>
-        <h1 className="heading-display mt-2 text-5xl text-ink md:text-6xl">
-          Co warto zobaczyć w regionie
-        </h1>
-        <p className="text-ui mt-6 max-w-2xl text-cypress/80">
+        <div className="flex items-center gap-3">
+          <span className="text-eyebrow text-gold">Przewodnik · Atrakcje</span>
+          <TricoloreRule size="md" />
+        </div>
+
+        <div className="mt-5 flex items-end gap-4">
+          <CypressIcon size={42} className="text-olive shrink-0" />
+          <h1 className="heading-display text-5xl text-ink md:text-7xl">
+            Co warto <span className="italic text-olive">zobaczyć</span>
+          </h1>
+        </div>
+        <p className="text-motto mt-3 text-lg md:text-xl">— da non perdere —</p>
+
+        <p className="text-ui mt-6 max-w-2xl text-cypress/85">
           Orte Sotterranea, Bomarzo, Civita di Bagnoregio i inne miejsca w
           okolicy — sprawdzone propozycje na półdniowe i całodniowe wycieczki.
         </p>
 
+        <SectionDivider motto="da non perdere" />
+
         {attractions.length === 0 ? (
-          <p className="mt-12 text-sm text-muted">Brak atrakcji w tym regionie.</p>
+          <p className="font-display text-lg italic text-stone">
+            Pagina ancora bianca — brak atrakcji w tym regionie.
+          </p>
         ) : (
-          <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {attractions.map((a) => {
               const stat = stats.get(a.id);
               return (

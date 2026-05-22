@@ -1,15 +1,13 @@
 export const dynamic = 'force-dynamic';
 
-/**
- * `/rome/itinerary` — one-day Rome itinerary.
- *
- * Wymagania pokryte: 20.
- */
-
 import Link from 'next/link';
 import { Sun, Sunrise, Sunset, Moon, ExternalLink } from 'lucide-react';
 
 import { MapEmbed } from '@/components/public/MapEmbed';
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { RomanBadge, toRoman } from '@/components/public/decorative/RomanBadge';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
+import { RomanArchIcon } from '@/components/public/decorative/ItalianIcons';
 import { createServerClient } from '@/lib/supabase/server';
 import { getRomeItinerary } from '@/lib/data/rome';
 import { getRestaurants } from '@/lib/data/restaurants';
@@ -26,6 +24,13 @@ const DAY_PART_LABEL: Record<DayPart, string> = {
   noon: 'Południe',
   afternoon: 'Popołudnie',
   evening: 'Wieczór',
+};
+
+const DAY_PART_MOTTO: Record<DayPart, string> = {
+  morning: 'la mattina',
+  noon: 'mezzogiorno',
+  afternoon: 'pomeriggio',
+  evening: 'la sera',
 };
 
 const DAY_PART_ICON: Record<DayPart, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -76,38 +81,49 @@ export default async function RomeItineraryPage() {
   })).filter((g) => g.items.length > 0);
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <div className="mx-auto max-w-4xl px-6 py-16">
-        <p className="text-eyebrow">Rzym · Itinerary</p>
-        <h1 className="heading-display mt-2 text-5xl text-ink md:text-6xl">
-          Jeden dzień w Rzymie
-        </h1>
-        <p className="text-ui mt-6 max-w-2xl text-cypress/80">
+        <div className="flex items-center gap-3">
+          <span className="text-eyebrow text-gold">Rzym · Plan dnia</span>
+          <TricoloreRule size="md" />
+        </div>
+
+        <div className="mt-5 flex items-end gap-4">
+          <RomanArchIcon size={42} className="text-olive shrink-0" />
+          <h1 className="heading-display text-5xl text-ink md:text-7xl">
+            Jeden dzień <span className="italic text-olive">w Rzymie</span>
+          </h1>
+        </div>
+        <p className="text-motto mt-3 text-lg md:text-xl">— una giornata romana —</p>
+
+        <p className="text-ui mt-6 max-w-2xl text-cypress/85">
           Plan poranek → wieczór, zaprojektowany pod realny przyjazd pociągiem
           z Orte. Każdy punkt linkuje do strony szczegółowej restauracji lub
           atrakcji.
         </p>
 
         {grouped.length === 0 ? (
-          <p className="mt-12 rounded-2xl border border-border bg-flag-white p-6 text-sm text-muted">
-            Plan dnia będzie dostępny po skonfigurowaniu bazy.
+          <p className="mt-12 border border-gold/30 bg-flag-white p-8 text-center font-display italic text-stone">
+            Pagina ancora bianca — plan dnia pojawi się po skonfigurowaniu bazy.
           </p>
         ) : (
-          <div className="mt-12 space-y-10">
-            {grouped.map(({ dayPart, items }) => {
+          <div className="mt-8 space-y-12">
+            {grouped.map(({ dayPart, items: partItems }, idx) => {
               const Icon = DAY_PART_ICON[dayPart];
               return (
                 <section key={dayPart}>
-                  <div className="flex items-center gap-3">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-soft-green text-italian-green">
-                      <Icon size={20} />
-                    </span>
-                    <h2 className="heading-section text-3xl text-ink">
+                  <SectionDivider motto={DAY_PART_MOTTO[dayPart]} />
+
+                  <div className="flex items-center gap-4">
+                    <RomanBadge numeral={toRoman(idx + 1)} size="md" variant="terracotta" />
+                    <Icon size={28} className="text-olive" />
+                    <h2 className="heading-section text-2xl text-ink md:text-4xl">
                       {DAY_PART_LABEL[dayPart]}
                     </h2>
                   </div>
-                  <div className="mt-4 space-y-6">
-                    {items.map((item) => {
+
+                  <div className="mt-6 space-y-6">
+                    {partItems.map((item) => {
                       const restaurant = item.linkedRestaurantId
                         ? restaurantById.get(item.linkedRestaurantId)
                         : null;
@@ -118,9 +134,9 @@ export default async function RomeItineraryPage() {
                       return (
                         <article
                           key={item.id}
-                          className="rounded-2xl border border-border bg-flag-white p-6"
+                          className="border border-gold/30 bg-flag-white p-7 shadow-warm"
                         >
-                          <h3 className="heading-section text-2xl text-ink">
+                          <h3 className="font-display text-2xl text-ink md:text-3xl">
                             {item.title}
                           </h3>
                           <p className="text-ui mt-3 whitespace-pre-line text-cypress/85">
@@ -128,11 +144,11 @@ export default async function RomeItineraryPage() {
                           </p>
 
                           {(restaurant || attraction) && (
-                            <div className="mt-5">
+                            <div className="mt-5 flex flex-wrap gap-2">
                               {restaurant && (
                                 <Link
                                   href={`/restaurants/${restaurant.slug}`}
-                                  className="inline-flex items-center gap-2 rounded-full border border-italian-green/30 bg-soft-green px-4 py-1.5 text-xs font-semibold text-italian-green hover:bg-italian-green hover:text-flag-white"
+                                  className="inline-flex items-center gap-2 border border-gold/40 bg-paper px-3 py-1.5 text-xs font-display italic text-terracotta hover:border-gold hover:bg-gold/5"
                                 >
                                   Restauracja: {restaurant.name}
                                   <ExternalLink size={12} />
@@ -141,7 +157,7 @@ export default async function RomeItineraryPage() {
                               {attraction && (
                                 <Link
                                   href={`/places/${attraction.slug}`}
-                                  className="inline-flex items-center gap-2 rounded-full border border-italian-green/30 bg-soft-green px-4 py-1.5 text-xs font-semibold text-italian-green hover:bg-italian-green hover:text-flag-white"
+                                  className="inline-flex items-center gap-2 border border-gold/40 bg-paper px-3 py-1.5 text-xs font-display italic text-terracotta hover:border-gold hover:bg-gold/5"
                                 >
                                   Atrakcja: {attraction.name}
                                   <ExternalLink size={12} />
@@ -151,7 +167,7 @@ export default async function RomeItineraryPage() {
                           )}
 
                           {(restaurant || attraction) && (
-                            <div className="mt-4">
+                            <div className="mt-5">
                               <MapEmbed
                                 address={restaurant?.address ?? attraction?.address}
                                 placeId={restaurant?.placeId ?? attraction?.placeId}

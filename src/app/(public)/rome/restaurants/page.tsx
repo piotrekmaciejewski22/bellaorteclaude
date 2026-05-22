@@ -1,12 +1,9 @@
 export const dynamic = 'force-dynamic';
 
-/**
- * `/rome/restaurants` — restaurants in Rome region.
- *
- * Wymagania pokryte: 19.
- */
-
 import { PlaceCard } from '@/components/public/PlaceCard';
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
+import { AmphoraIcon } from '@/components/public/decorative/ItalianIcons';
 import { createServerClient } from '@/lib/supabase/server';
 import { getRestaurants } from '@/lib/data/restaurants';
 import { getRestaurantReviewStats } from '@/lib/data/review-stats';
@@ -41,21 +38,32 @@ export default async function RomeRestaurantsPage() {
   }
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <p className="text-eyebrow">Rzym · Restauracje</p>
-        <h1 className="heading-display mt-2 text-5xl text-ink md:text-6xl">
-          Gdzie zjeść w Rzymie
-        </h1>
-        <p className="text-ui mt-6 max-w-2xl text-cypress/80">
-          Klasyki kuchni rzymskiej w wybranych dzielnicach. Każde miejsce
-          z polecanym lunchem lub kolacją podczas jednodniowej wycieczki z Orte.
+        <div className="flex items-center gap-3">
+          <span className="text-eyebrow text-gold">Rzym · Restauracje</span>
+          <TricoloreRule size="md" />
+        </div>
+
+        <div className="mt-5 flex items-end gap-4">
+          <AmphoraIcon size={42} className="text-olive shrink-0" />
+          <h1 className="heading-display text-5xl text-ink md:text-7xl">
+            Gdzie <span className="italic text-olive">zjeść</span> w Rzymie
+          </h1>
+        </div>
+        <p className="text-motto mt-3 text-lg md:text-xl">— mangiare a Roma —</p>
+
+        <p className="text-ui mt-6 max-w-2xl text-cypress/85">
+          Klasyki kuchni rzymskiej w wybranych dzielnicach. Każde miejsce z
+          polecanym lunchem lub kolacją podczas jednodniowej wycieczki z Orte.
         </p>
 
+        <SectionDivider motto="la cucina romana" />
+
         {restaurants.length === 0 ? (
-          <p className="mt-12 text-sm text-muted">Brak restauracji w Rzymie.</p>
+          <p className="font-display italic text-stone">Brak restauracji w Rzymie.</p>
         ) : (
-          <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {restaurants.map((r) => {
               const stat = stats.get(r.id);
               return (

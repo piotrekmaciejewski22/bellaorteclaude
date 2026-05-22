@@ -1,12 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 /**
- * `/apartments/[slug]` — apartment detail page.
+ * `/apartments/[slug]` — strona szczegółu apartamentu.
  *
- * Server Component. Falls back to mock data if Supabase is not yet
- * configured (so the page can be previewed before deploy). The kalendarz
- * (AvailabilityCalendar) calls `/api/availability` which itself works
- * only against a live Supabase project.
- *
- * Wymagania pokryte: 5, 6.
+ * Magazynowy lifting: numer rzymski, gold-frame galeria, italic detale.
  */
 
 import { notFound } from 'next/navigation';
@@ -17,11 +14,21 @@ import { ArrowLeft, BedDouble, Bath, Users, MapPin } from 'lucide-react';
 import { AvailabilityCalendar } from '@/components/public/AvailabilityCalendar';
 import { StatusLegend } from '@/components/public/StatusLegend';
 import { ApartmentGallery, type GalleryPhotoEntry } from '@/components/public/ApartmentGallery';
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { RomanBadge } from '@/components/public/decorative/RomanBadge';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
+import { OrnamentSimple } from '@/components/public/decorative/Ornament';
+import { TowerIcon } from '@/components/public/decorative/ItalianIcons';
 import {
   MOCK_APARTMENTS,
   MOCK_APARTMENT_HERO,
 } from '@/lib/mock-data';
-import { getApartmentBySlug, getApartmentGallery, filterDisplayablePhotos, publicSiteMediaUrl } from '@/lib/data/apartments';
+import {
+  getApartmentBySlug,
+  getApartmentGallery,
+  filterDisplayablePhotos,
+  publicSiteMediaUrl,
+} from '@/lib/data/apartments';
 import { createServerClient } from '@/lib/supabase/server';
 import type { Apartment } from '@/lib/types';
 
@@ -30,7 +37,6 @@ interface PageProps {
 }
 
 async function loadApartment(slug: string): Promise<Apartment | null> {
-  // Try Supabase first; if env not configured, fall back to mock.
   if (
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -49,14 +55,10 @@ async function loadApartment(slug: string): Promise<Apartment | null> {
 export default async function ApartmentDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const apartment = await loadApartment(slug);
-
-  if (!apartment) {
-    notFound();
-  }
+  if (!apartment) notFound();
 
   const hero = MOCK_APARTMENT_HERO[slug] ?? '/placeholders/orte-1.svg';
 
-  // Try loading gallery; fall back to a single hero placeholder.
   let galleryEntries: GalleryPhotoEntry[] = [
     {
       id: `${apartment.id}-hero-mock`,
@@ -87,68 +89,83 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
   const heroDisplay = galleryEntries[0]?.url ?? hero;
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <div className="mx-auto max-w-6xl px-6 py-12">
         <Link
           href="/apartments"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-italian-green hover:text-cypress"
+          className="link-italic inline-flex items-center gap-1 font-display italic text-terracotta hover:text-wine"
         >
           <ArrowLeft size={14} /> Wszystkie apartamenty
         </Link>
 
-        <header className="mt-6 grid gap-8 lg:grid-cols-2">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border">
-            <Image
-              src={heroDisplay}
-              alt={`Widok apartamentu ${apartment.name}`}
-              fill
-              priority
-              unoptimized
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
+        <header className="mt-8 grid gap-10 lg:grid-cols-[1fr,1.1fr] lg:items-start">
+          <div className="relative">
+            {/* Numer rzymski wystający */}
+            <div className="absolute -left-3 -top-5 z-10">
+              <RomanBadge numeral={apartment.slug.includes('uno') ? 'I' : 'II'} size="lg" variant="gold" />
+            </div>
+            {/* Złoty frame z odsadzeniem */}
+            <div aria-hidden="true" className="absolute -inset-3 -z-10 border border-gold/40" />
+            <div className="relative aspect-[4/3] overflow-hidden bg-paper">
+              <Image
+                src={heroDisplay}
+                alt={`Widok apartamentu ${apartment.name}`}
+                fill
+                priority
+                unoptimized
+                sizes="(min-width: 1024px) 540px, 100vw"
+                className="object-cover"
+              />
+            </div>
+            <p className="mt-5 flex items-center gap-3 font-display text-sm italic text-stone">
+              <OrnamentSimple className="h-2 w-12 text-gold" />
+              <span>{apartment.name} · Orte, Tuscia</span>
+            </p>
           </div>
 
           <div>
-            <p className="text-eyebrow">Apartament BELLAORTE</p>
-            <h1 className="heading-display mt-2 text-5xl text-ink">
+            <div className="flex items-center gap-3">
+              <span className="text-eyebrow text-gold">Apartament</span>
+              <TricoloreRule size="md" />
+            </div>
+            <h1 className="heading-display mt-4 text-5xl text-ink md:text-6xl">
               {apartment.name}
             </h1>
-            <p className="text-ui mt-4 text-cypress/80">
-              {apartment.description}
-            </p>
+            <p className="text-motto mt-3 text-lg">— una casa nel cuore di Orte —</p>
 
-            <ul className="mt-6 grid grid-cols-3 gap-4 rounded-xl border border-border bg-flag-white p-4 text-sm text-cypress">
+            <p className="text-ui mt-6 text-cypress/85">{apartment.description}</p>
+
+            <ul className="mt-7 grid grid-cols-3 gap-4 border-y border-gold/30 py-5 font-display text-cypress">
               <li className="flex flex-col items-center gap-1">
-                <Users size={18} className="text-italian-green" />
-                <span className="font-display text-lg">{apartment.maxGuests}</span>
-                <span className="text-xs text-muted">
+                <Users size={18} className="text-olive" />
+                <span className="text-2xl">{apartment.maxGuests}</span>
+                <span className="text-xs uppercase tracking-wider text-stone">
                   {apartment.maxGuests === 1 ? 'gość' : 'gości'}
                 </span>
               </li>
               <li className="flex flex-col items-center gap-1">
-                <BedDouble size={18} className="text-italian-green" />
-                <span className="font-display text-lg">{apartment.bedrooms}</span>
-                <span className="text-xs text-muted">
+                <BedDouble size={18} className="text-olive" />
+                <span className="text-2xl">{apartment.bedrooms}</span>
+                <span className="text-xs uppercase tracking-wider text-stone">
                   {apartment.bedrooms === 1 ? 'sypialnia' : 'sypialnie'}
                 </span>
               </li>
               <li className="flex flex-col items-center gap-1">
-                <Bath size={18} className="text-italian-green" />
-                <span className="font-display text-lg">{apartment.bathrooms}</span>
-                <span className="text-xs text-muted">
+                <Bath size={18} className="text-olive" />
+                <span className="text-2xl">{apartment.bathrooms}</span>
+                <span className="text-xs uppercase tracking-wider text-stone">
                   {apartment.bathrooms === 1 ? 'łazienka' : 'łazienki'}
                 </span>
               </li>
             </ul>
 
-            <div className="mt-6">
-              <p className="text-eyebrow">Udogodnienia</p>
-              <ul className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-7">
+              <p className="text-eyebrow text-gold">Udogodnienia</p>
+              <ul className="mt-3 flex flex-wrap gap-2">
                 {apartment.amenities.map((a) => (
                   <li
                     key={a}
-                    className="rounded-full bg-soft-green px-3 py-1 text-xs font-medium text-cypress"
+                    className="border border-gold/30 px-3 py-1 text-[11px] uppercase tracking-wider text-stone"
                   >
                     {a}
                   </li>
@@ -156,23 +173,25 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
               </ul>
             </div>
 
-            <div className="mt-6">
-              <p className="text-eyebrow">Zasady pobytu</p>
-              <p className="mt-2 whitespace-pre-line text-sm text-cypress/80">
+            <div className="mt-7">
+              <p className="text-eyebrow text-gold">Zasady pobytu</p>
+              <p className="mt-3 whitespace-pre-line text-sm text-cypress/85">
                 {apartment.houseRules}
               </p>
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-9 flex flex-wrap gap-4">
               <Link
                 href={`/booking?apartmentId=${apartment.id}`}
-                className="rounded-full bg-italian-green px-7 py-3 text-base font-semibold text-flag-white shadow-sm transition-colors hover:bg-cypress"
+                className="group inline-flex items-center gap-3 border-2 border-olive bg-olive px-7 py-3 font-display text-base text-crema shadow-warm hover:bg-olive-deep"
               >
-                Wyślij zapytanie
+                <span className="text-gold-soft">·</span>
+                <span>Wyślij zapytanie</span>
+                <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
               </Link>
               <a
                 href="#kalendarz"
-                className="rounded-full border border-cypress/30 bg-flag-white px-7 py-3 text-base font-semibold text-cypress hover:border-italian-green hover:text-italian-green"
+                className="link-italic font-display italic text-terracotta hover:text-wine"
               >
                 Zobacz kalendarz
               </a>
@@ -181,28 +200,33 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
         </header>
 
         {galleryEntries.length > 1 && (
-          <section className="mt-12">
-            <p className="text-eyebrow">Galeria</p>
-            <h2 className="heading-section mt-1 text-3xl text-ink">
-              Zobacz wnętrza i okolicę
-            </h2>
-            <div className="mt-6">
-              <ApartmentGallery photos={galleryEntries} />
-            </div>
-          </section>
+          <>
+            <SectionDivider motto="immagini di una casa" />
+            <section>
+              <p className="text-eyebrow text-gold">Galeria</p>
+              <h2 className="heading-section mt-2 text-3xl text-ink">
+                Wnętrza i okolica
+              </h2>
+              <div className="mt-6">
+                <ApartmentGallery photos={galleryEntries} />
+              </div>
+            </section>
+          </>
         )}
+
+        <SectionDivider motto="quando volete venire" />
 
         <section
           id="kalendarz"
           aria-labelledby="kalendarz-heading"
-          className="mt-12 scroll-mt-20"
+          className="scroll-mt-20"
         >
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <p className="text-eyebrow">Dostępność</p>
+              <p className="text-eyebrow text-gold">Dostępność</p>
               <h2
                 id="kalendarz-heading"
-                className="heading-section mt-1 text-3xl text-ink"
+                className="heading-section mt-2 text-3xl text-ink md:text-4xl"
               >
                 Kiedy chcesz przyjechać?
               </h2>
@@ -216,18 +240,25 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
           />
         </section>
 
-        <section className="mt-16 rounded-2xl border border-border bg-flag-white p-8">
-          <p className="text-eyebrow">Lokalizacja</p>
-          <h2 className="heading-section mt-1 text-2xl text-ink">
-            W sercu Orte
-          </h2>
-          <p className="text-ui mt-3 max-w-2xl text-cypress/80">
+        <SectionDivider motto="dove siamo" />
+
+        <section className="border border-gold/30 bg-paper/50 p-8 md:p-12">
+          <div className="flex items-center gap-3">
+            <TowerIcon size={28} className="text-olive" />
+            <div>
+              <p className="text-eyebrow text-gold">Lokalizacja</p>
+              <h2 className="font-display text-2xl text-ink md:text-3xl">
+                W sercu <span className="italic text-olive">Orte</span>
+              </h2>
+            </div>
+          </div>
+          <p className="text-ui mt-5 max-w-2xl text-cypress/85">
             Apartament znajduje się w zabytkowym centrum Orte, w odległości
             spaceru od Orte Sotterranea, lokalnych restauracji i stacji
             kolejowej z bezpośrednim dojazdem do Rzymu.
           </p>
           <p className="mt-4 inline-flex items-center gap-2 text-sm text-italian-green">
-            <MapPin size={14} /> Orte, Prowincja Viterbo, Włochy
+            <MapPin size={14} /> Orte · Provincia di Viterbo · Włochy
           </p>
         </section>
       </div>

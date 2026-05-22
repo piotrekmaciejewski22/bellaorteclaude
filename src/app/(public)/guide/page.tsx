@@ -1,15 +1,18 @@
 export const dynamic = 'force-dynamic';
 
-/**
- * `/guide` — guide hub.
- *
- * Wymagania pokryte: 13.
- */
-
 import Link from 'next/link';
-import { ArrowRight, Compass, Map, Train, Utensils } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 import { PlaceCard } from '@/components/public/PlaceCard';
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { RomanBadge } from '@/components/public/decorative/RomanBadge';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
+import {
+  AmphoraIcon,
+  AqueductIcon,
+  CypressIcon,
+  TuscanSunIcon,
+} from '@/components/public/decorative/ItalianIcons';
 import { createServerClient } from '@/lib/supabase/server';
 import { getRestaurants } from '@/lib/data/restaurants';
 import { getAttractions } from '@/lib/data/attractions';
@@ -18,27 +21,31 @@ import { MOCK_ATTRACTIONS, MOCK_RESTAURANTS } from '@/lib/mock-data';
 const GUIDE_LINKS = [
   {
     href: '/restaurants',
-    label: 'Restauracje w okolicy',
+    label: 'Restauracje',
     blurb: 'Trattorie i pizzerie wokół Orte — sprawdzone osobiście.',
-    icon: Utensils,
+    Icon: AmphoraIcon,
+    roman: 'I' as const,
   },
   {
     href: '/places',
-    label: 'Atrakcje regionu',
+    label: 'Atrakcje',
     blurb: 'Orte Sotterranea, Bomarzo, Civita di Bagnoregio.',
-    icon: Map,
+    Icon: CypressIcon,
+    roman: 'II' as const,
   },
   {
     href: '/rome',
     label: 'Jeden dzień w Rzymie',
-    blurb: 'Itinerary, transport, bilety, wskazówki praktyczne.',
-    icon: Compass,
+    blurb: 'Plan dnia, transport, bilety, wskazówki praktyczne.',
+    Icon: AqueductIcon,
+    roman: 'III' as const,
   },
   {
     href: '/useful-info',
     label: 'Informacje praktyczne',
     blurb: 'Pociągi, wynajem auta, dojazd do Rzymu, kierunki.',
-    icon: Train,
+    Icon: TuscanSunIcon,
+    roman: 'IV' as const,
   },
 ] as const;
 
@@ -64,36 +71,39 @@ export default async function GuidePage() {
   }
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <section className="mx-auto max-w-6xl px-6 py-16">
-        <p className="text-eyebrow">Przewodnik</p>
-        <h1 className="heading-display mt-2 text-5xl text-ink md:text-6xl">
-          Wszystko, co przyda Ci się w Orte
+        <div className="flex items-center gap-3">
+          <span className="text-eyebrow text-gold">Wydanie · Przewodnik</span>
+          <TricoloreRule size="md" />
+        </div>
+        <h1 className="heading-display mt-5 text-5xl text-ink md:text-7xl">
+          Wszystko, <span className="italic text-olive">co przyda się</span> w Orte
         </h1>
-        <p className="text-ui mt-6 max-w-2xl text-cypress/80">
+        <p className="text-motto mt-3 text-lg md:text-xl">— la guida di Bellaorte —</p>
+
+        <p className="text-ui mt-6 max-w-2xl text-cypress/85">
           Cztery sekcje, jeden cel: spokojny pobyt bez przeglądania dziesiątek
-          stron. Niczego nie polecamy „na ślepo” — każde miejsce sprawdzone na
-          żywo.
+          stron. Każde miejsce sprawdzone na żywo.
         </p>
 
-        <ul className="mt-12 grid gap-6 md:grid-cols-2">
-          {GUIDE_LINKS.map(({ href, label, blurb, icon: Icon }) => (
+        <SectionDivider motto="piano, piano" />
+
+        <ul className="grid gap-6 md:grid-cols-2">
+          {GUIDE_LINKS.map(({ href, label, blurb, Icon, roman }) => (
             <li key={href}>
               <Link
                 href={href}
-                className="group flex h-full flex-col gap-3 rounded-2xl border border-border bg-flag-white p-6 transition-colors hover:border-italian-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-italian-green"
+                className="group flex h-full flex-col gap-4 border border-gold/30 bg-flag-white p-7 transition-all hover:border-gold hover:shadow-warm-lg"
               >
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-soft-green text-italian-green">
-                  <Icon size={20} />
-                </span>
-                <p className="font-display text-2xl text-ink">{label}</p>
+                <div className="flex items-center justify-between">
+                  <RomanBadge numeral={roman} size="md" variant="gold" />
+                  <Icon size={32} className="text-olive" />
+                </div>
+                <p className="font-display text-3xl text-ink">{label}</p>
                 <p className="text-sm text-cypress/80">{blurb}</p>
-                <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-italian-green">
-                  Otwórz
-                  <ArrowRight
-                    size={14}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
+                <span className="mt-auto inline-flex items-center gap-1 font-display italic text-terracotta">
+                  Otwórz <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                 </span>
               </Link>
             </li>
@@ -101,23 +111,25 @@ export default async function GuidePage() {
         </ul>
       </section>
 
-      <section className="border-y border-border bg-flag-white">
+      <SectionDivider motto="le nostre raccomandazioni" />
+
+      <section className="border-y border-gold/30 bg-paper/50">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-eyebrow">Polecane restauracje</p>
-              <h2 className="heading-section mt-1 text-3xl text-ink">
-                Świeżo wybrane.
+              <p className="text-eyebrow text-gold">Polecane restauracje</p>
+              <h2 className="heading-section mt-2 text-3xl text-ink md:text-5xl">
+                Świeżo <span className="italic text-olive">wybrane</span>
               </h2>
             </div>
             <Link
               href="/restaurants"
-              className="text-sm font-semibold text-italian-green hover:text-cypress"
+              className="link-italic font-display italic text-terracotta hover:text-wine"
             >
-              Zobacz wszystkie →
+              Wszystkie →
             </Link>
           </div>
-          <ul className="mt-8 grid gap-6 md:grid-cols-3">
+          <ul className="mt-10 grid gap-6 md:grid-cols-3">
             {recommendedRestaurants.map((r) => (
               <li key={r.id}>
                 <PlaceCard
@@ -136,19 +148,19 @@ export default async function GuidePage() {
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-eyebrow">Polecane atrakcje</p>
-            <h2 className="heading-section mt-1 text-3xl text-ink">
-              Co warto zobaczyć.
+            <p className="text-eyebrow text-gold">Polecane atrakcje</p>
+            <h2 className="heading-section mt-2 text-3xl text-ink md:text-5xl">
+              Co <span className="italic text-olive">warto</span> zobaczyć
             </h2>
           </div>
           <Link
             href="/places"
-            className="text-sm font-semibold text-italian-green hover:text-cypress"
+            className="link-italic font-display italic text-terracotta hover:text-wine"
           >
-            Zobacz wszystkie →
+            Wszystkie →
           </Link>
         </div>
-        <ul className="mt-8 grid gap-6 md:grid-cols-3">
+        <ul className="mt-10 grid gap-6 md:grid-cols-3">
           {recommendedAttractions.map((a) => (
             <li key={a.id}>
               <PlaceCard

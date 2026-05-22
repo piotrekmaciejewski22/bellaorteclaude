@@ -1,13 +1,10 @@
 export const dynamic = 'force-dynamic';
 
-/**
- * `/useful-info` — practical travel information.
- *
- * Wymagania pokryte: 22.
- */
-
 import { ExternalLink } from 'lucide-react';
 
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { RomanBadge } from '@/components/public/decorative/RomanBadge';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
 import { createServerClient } from '@/lib/supabase/server';
 import { getTravelInfo, TRAVEL_INFO_KIND_PL } from '@/lib/data/travel-info';
 import type { TravelInfo, TravelInfoKind } from '@/lib/types';
@@ -19,8 +16,12 @@ const ORDER: TravelInfoKind[] = [
   'travel_directions',
 ];
 
-const FALLBACK_NOTE =
-  'Po podłączeniu bazy w tej sekcji pojawią się informacje praktyczne dot. dojazdu i podróży.';
+const ROMAN_FOR_KIND: Record<TravelInfoKind, 'I' | 'II' | 'III' | 'IV'> = {
+  rome_transfer: 'I',
+  trains: 'II',
+  car_rental: 'III',
+  travel_directions: 'IV',
+};
 
 export default async function UsefulInfoPage() {
   let entries: TravelInfo[] = [];
@@ -36,7 +37,6 @@ export default async function UsefulInfoPage() {
     }
   }
 
-  // Group by kind in fixed order.
   const groups = ORDER.map((kind) => ({
     kind,
     title: TRAVEL_INFO_KIND_PL[kind],
@@ -44,47 +44,58 @@ export default async function UsefulInfoPage() {
   })).filter((g) => g.items.length > 0);
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <div className="mx-auto max-w-4xl px-6 py-16">
-        <p className="text-eyebrow">Przewodnik · Praktyczne</p>
-        <h1 className="heading-display mt-2 text-5xl text-ink md:text-6xl">
-          Informacje, które przydadzą Ci się w drodze
+        <div className="flex items-center gap-3">
+          <span className="text-eyebrow text-gold">Praktyczne</span>
+          <TricoloreRule size="md" />
+        </div>
+        <h1 className="heading-display mt-5 text-5xl text-ink md:text-7xl">
+          Informacje, <span className="italic text-olive">które się przydadzą</span>
         </h1>
-        <p className="text-ui mt-6 max-w-2xl text-cypress/80">
+        <p className="text-motto mt-3 text-lg md:text-xl">— informazioni utili —</p>
+
+        <p className="text-ui mt-6 max-w-2xl text-cypress/85">
           Pociągi, dojazd do Rzymu, wynajem samochodu, kierunki podróży —
           wszystko zebrane w jednym miejscu.
         </p>
 
         {groups.length === 0 ? (
-          <p className="mt-12 rounded-2xl border border-border bg-flag-white p-6 text-sm text-muted">
-            {FALLBACK_NOTE}
+          <p className="mt-12 border border-gold/30 bg-flag-white p-8 text-center font-display italic text-stone">
+            Pagina ancora bianca — informacje pojawią się po skonfigurowaniu bazy.
           </p>
         ) : (
-          <div className="mt-12 space-y-10">
+          <div className="mt-12 space-y-12">
             {groups.map((group) => (
               <section key={group.kind}>
-                <p className="text-eyebrow">{group.title}</p>
-                <div className="mt-4 space-y-6">
+                <SectionDivider motto={group.title.toLowerCase()} />
+
+                <div className="flex items-center gap-4">
+                  <RomanBadge numeral={ROMAN_FOR_KIND[group.kind]} size="md" variant="gold" />
+                  <h2 className="heading-section text-2xl text-ink md:text-4xl">
+                    {group.title}
+                  </h2>
+                </div>
+
+                <div className="mt-6 space-y-6">
                   {group.items.map((item) => (
                     <article
                       key={item.id}
-                      className="rounded-2xl border border-border bg-flag-white p-6"
+                      className="border border-gold/30 bg-flag-white p-7 shadow-warm"
                     >
-                      <h2 className="heading-section text-2xl text-ink">
-                        {item.title}
-                      </h2>
-                      <div className="text-ui mt-3 whitespace-pre-line text-cypress/85">
+                      <h3 className="font-display text-2xl text-ink">{item.title}</h3>
+                      <div className="text-ui mt-4 whitespace-pre-line text-cypress/85">
                         {item.body}
                       </div>
                       {item.externalLinks.length > 0 && (
-                        <ul className="mt-4 flex flex-wrap gap-2">
+                        <ul className="mt-5 flex flex-wrap gap-2">
                           {item.externalLinks.map((link) => (
                             <li key={link.url}>
                               <a
                                 href={link.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 rounded-full border border-italian-green/30 bg-soft-green px-3 py-1.5 text-xs font-semibold text-italian-green hover:bg-italian-green hover:text-flag-white"
+                                className="inline-flex items-center gap-1 border border-gold/40 bg-paper px-3 py-1.5 text-xs font-display italic text-terracotta hover:border-gold hover:bg-gold/5"
                               >
                                 {link.label}
                                 <ExternalLink size={11} />

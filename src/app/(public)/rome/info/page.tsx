@@ -1,11 +1,8 @@
 export const dynamic = 'force-dynamic';
 
-/**
- * `/rome/info` — practical Rome info sections.
- *
- * Wymagania pokryte: 21.
- */
-
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
+import { AqueductIcon } from '@/components/public/decorative/ItalianIcons';
 import { createServerClient } from '@/lib/supabase/server';
 import { getRomeInfoSections } from '@/lib/data/rome';
 import type { RomeInfoSection } from '@/lib/types';
@@ -25,30 +22,41 @@ export default async function RomeInfoPage() {
   }
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <div className="mx-auto max-w-3xl px-6 py-16">
-        <p className="text-eyebrow">Rzym · Praktyczne</p>
-        <h1 className="heading-display mt-2 text-5xl text-ink md:text-6xl">
-          Co warto wiedzieć przed wyjazdem
-        </h1>
-        <p className="text-ui mt-6 max-w-2xl text-cypress/80">
+        <div className="flex items-center gap-3">
+          <span className="text-eyebrow text-gold">Rzym · Praktyczne</span>
+          <TricoloreRule size="md" />
+        </div>
+
+        <div className="mt-5 flex items-end gap-4">
+          <AqueductIcon size={42} className="text-olive shrink-0" />
+          <h1 className="heading-display text-4xl text-ink md:text-6xl">
+            Co warto <span className="italic text-olive">wiedzieć</span> przed wyjazdem
+          </h1>
+        </div>
+        <p className="text-motto mt-3 text-lg md:text-xl">— informazioni utili a Roma —</p>
+
+        <p className="text-ui mt-6 text-cypress/85">
           Transport, bilety, godziny otwarcia i bezpieczeństwo — pakiet
-          informacji, które przydadzą Ci się w Rzymie.
+          informacji, które przydadzą się w Rzymie.
         </p>
 
+        <SectionDivider motto="il segreto è la preparazione" />
+
         {sections.length === 0 ? (
-          <p className="mt-12 rounded-2xl border border-border bg-flag-white p-6 text-sm text-muted">
-            Sekcje pojawią się po skonfigurowaniu bazy.
+          <p className="border border-gold/30 bg-flag-white p-8 text-center font-display italic text-stone">
+            Pagina ancora bianca — sekcje pojawią się po skonfigurowaniu bazy.
           </p>
         ) : (
-          <div className="mt-12 space-y-8">
+          <div className="space-y-8">
             {sections.map((s) => (
               <article
                 key={s.id}
-                className="rounded-2xl border border-border bg-flag-white p-6"
+                className="border border-gold/30 bg-flag-white p-7 shadow-warm"
               >
-                <h2 className="heading-section text-2xl text-ink">{s.title}</h2>
-                <div className="text-ui mt-3 whitespace-pre-line text-cypress/85">
+                <h2 className="heading-section text-2xl text-ink md:text-3xl">{s.title}</h2>
+                <div className="text-ui mt-4 whitespace-pre-line text-cypress/85">
                   {s.body}
                 </div>
               </article>

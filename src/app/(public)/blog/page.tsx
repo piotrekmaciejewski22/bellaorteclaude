@@ -1,13 +1,12 @@
 export const dynamic = 'force-dynamic';
 
-/**
- * `/blog` — list of published blog posts.
- */
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Newspaper } from 'lucide-react';
 
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
+import { OrnamentSimple } from '@/components/public/decorative/Ornament';
 import { createServerClient } from '@/lib/supabase/server';
 import { getBlogPosts } from '@/lib/data/blog';
 import { publicSiteMediaUrl } from '@/lib/data/apartments';
@@ -34,53 +33,78 @@ export default async function BlogIndexPage() {
   }
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <div className="mx-auto max-w-5xl px-6 py-16">
-        <p className="text-eyebrow">Blog</p>
-        <h1 className="heading-display mt-2 text-5xl text-ink md:text-6xl">
-          Notatki z Orte
+        <div className="flex items-center gap-3">
+          <span className="text-eyebrow text-gold">Wydanie · Blog</span>
+          <TricoloreRule size="md" />
+        </div>
+
+        <h1 className="heading-display mt-5 text-5xl text-ink md:text-7xl">
+          Notatki <span className="italic text-olive">z Orte</span>
         </h1>
-        <p className="text-ui mt-6 max-w-2xl text-cypress/80">
+        <p className="text-motto mt-3 text-lg md:text-xl">— il diario di Bellaorte —</p>
+
+        <p className="text-ui mt-6 max-w-2xl text-cypress/85">
           Krótkie wpisy o tym, co u nas — jedzenie, sąsiedzi, pogoda, miejsca,
           które właśnie odkryliśmy. Pisze siostra, redaguje rodzina.
         </p>
 
+        <SectionDivider motto="ogni giorno una storia" />
+
         {posts.length === 0 ? (
-          <p className="mt-12 rounded-2xl border border-border bg-flag-white p-6 text-sm text-muted">
-            Pierwszy wpis pojawi się tutaj wkrótce.
-          </p>
+          <div className="border border-gold/30 bg-flag-white p-10 text-center">
+            <OrnamentSimple className="mx-auto h-3 w-32 text-gold" />
+            <p className="font-display italic mt-5 text-2xl text-stone">
+              Pagina ancora bianca.
+            </p>
+            <p className="mt-2 text-sm text-muted">
+              Pierwszy wpis pojawi się tutaj wkrótce.
+            </p>
+          </div>
         ) : (
-          <ul className="mt-12 space-y-8">
-            {posts.map((post) => (
+          <ul className="space-y-12">
+            {posts.map((post, idx) => (
               <li key={post.id}>
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="group grid gap-6 rounded-2xl border border-border bg-flag-white p-5 transition-shadow hover:shadow-md md:grid-cols-[280px,1fr]"
+                  className="group grid items-center gap-8 md:grid-cols-[280px,1fr]"
                 >
-                  {post.heroImagePath && (
-                    <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
-                      <Image
-                        src={publicSiteMediaUrl(post.heroImagePath)}
-                        alt={post.title}
-                        fill
-                        unoptimized
-                        sizes="(min-width: 768px) 280px, 100vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
+                  {post.heroImagePath ? (
+                    <div className="relative">
+                      <div aria-hidden="true" className="absolute -inset-2 -z-10 border border-gold/30" />
+                      <div className="relative aspect-[4/3] overflow-hidden bg-paper">
+                        <Image
+                          src={publicSiteMediaUrl(post.heroImagePath)}
+                          alt=""
+                          fill
+                          unoptimized
+                          sizes="(min-width: 768px) 280px, 100vw"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex aspect-[4/3] items-center justify-center border border-gold/30 bg-paper text-stone">
+                      <Newspaper size={48} aria-hidden="true" />
                     </div>
                   )}
-                  <div className={post.heroImagePath ? '' : 'md:col-span-2'}>
-                    <p className="text-eyebrow">{formatDate(post.publishedAt)}</p>
-                    <h2 className="heading-section mt-1 text-3xl text-ink group-hover:text-italian-green">
+                  <div>
+                    <p className="text-eyebrow text-gold">
+                      Nr {idx + 1} · {formatDate(post.publishedAt)}
+                    </p>
+                    <h2 className="heading-section mt-2 text-3xl text-ink md:text-4xl group-hover:text-terracotta">
                       {post.title}
                     </h2>
                     {post.excerpt && (
                       <p className="text-ui mt-3 text-cypress/85">{post.excerpt}</p>
                     )}
                     {post.authorSignature && (
-                      <p className="mt-3 text-xs text-muted">— {post.authorSignature}</p>
+                      <p className="font-display mt-3 text-sm italic text-stone">
+                        — {post.authorSignature}
+                      </p>
                     )}
-                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-italian-green">
+                    <span className="link-italic mt-4 inline-flex items-center gap-1 font-display italic text-terracotta">
                       Czytaj <ArrowRight size={14} />
                     </span>
                   </div>

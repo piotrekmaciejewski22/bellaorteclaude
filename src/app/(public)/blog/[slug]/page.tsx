@@ -1,6 +1,4 @@
-/**
- * `/blog/[slug]` — single blog post with comments.
- */
+export const dynamic = 'force-dynamic';
 
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -8,6 +6,9 @@ import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import { ArrowLeft } from 'lucide-react';
 
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { OrnamentSimple } from '@/components/public/decorative/Ornament';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
 import { createServerClient } from '@/lib/supabase/server';
 import { getBlogPostBySlug, getApprovedComments } from '@/lib/data/blog';
 import { getSiteSettings } from '@/lib/data/settings';
@@ -49,72 +50,94 @@ export default async function BlogPostPage({ params }: PageProps) {
   const heroUrl = post.heroImagePath ? publicSiteMediaUrl(post.heroImagePath) : null;
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <article className="mx-auto max-w-3xl px-6 py-12">
         <Link
           href="/blog"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-italian-green hover:text-cypress"
+          className="link-italic inline-flex items-center gap-1 font-display italic text-terracotta hover:text-wine"
         >
           <ArrowLeft size={14} /> Wróć do bloga
         </Link>
 
-        <header className="mt-6">
-          <p className="text-eyebrow">{formatDate(post.publishedAt)}</p>
-          <h1 className="heading-display mt-2 text-4xl text-ink md:text-5xl">
+        <header className="mt-10 text-center">
+          <div className="flex items-center justify-center gap-3">
+            <span className="text-eyebrow text-gold">{formatDate(post.publishedAt)}</span>
+            <TricoloreRule size="sm" />
+          </div>
+          <h1 className="heading-display mt-5 text-4xl text-ink md:text-6xl">
             {post.title}
           </h1>
           {post.authorSignature && (
-            <p className="mt-3 text-sm text-muted">— {post.authorSignature}</p>
+            <p className="font-display mt-4 text-base italic text-stone">
+              — {post.authorSignature}
+            </p>
           )}
+          <OrnamentSimple className="mx-auto mt-7 h-3 w-32 text-gold" />
         </header>
 
         {heroUrl && (
-          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-border">
-            <Image
-              src={heroUrl}
-              alt={post.title}
-              fill
-              priority
-              unoptimized
-              sizes="(min-width: 1024px) 768px, 100vw"
-              className="object-cover"
-            />
+          <div className="relative mt-10">
+            <div aria-hidden="true" className="absolute -inset-3 -z-10 border border-gold/40" />
+            <div className="relative aspect-[16/9] overflow-hidden bg-paper">
+              <Image
+                src={heroUrl}
+                alt={post.title}
+                fill
+                priority
+                unoptimized
+                sizes="(min-width: 1024px) 768px, 100vw"
+                className="object-cover"
+              />
+            </div>
+            <p className="mt-3 text-center font-display text-xs italic text-stone">
+              {post.title}
+            </p>
           </div>
         )}
 
-        <div className="markdown-body mt-10">
+        <div className="markdown-body mt-12">
           <ReactMarkdown>{post.bodyMd || post.excerpt}</ReactMarkdown>
         </div>
 
-        <hr className="mt-12 border-border" />
+        <SectionDivider motto="conversazione" />
 
-        <section className="mt-12">
-          <h2 className="heading-section text-2xl text-ink">Komentarze</h2>
+        <section>
+          <p className="text-eyebrow text-gold">Komentarze</p>
+          <h2 className="heading-section mt-2 text-3xl text-ink">
+            Co inni <span className="italic text-olive">napisali</span>
+          </h2>
 
           {comments.length === 0 ? (
-            <p className="mt-4 text-sm text-muted">Brak komentarzy. Bądź pierwszy.</p>
+            <p className="font-display mt-6 text-lg italic text-stone">
+              Pagina ancora bianca — bądź pierwszy.
+            </p>
           ) : (
-            <ul className="mt-6 space-y-4">
+            <ul className="mt-8 space-y-5">
               {comments.map((c) => (
                 <li
                   key={c.id}
-                  className="rounded-2xl border border-border bg-flag-white p-4"
+                  className="border border-gold/30 bg-flag-white p-5 shadow-warm"
                 >
-                  <p className="font-display text-base text-ink">{c.signature}</p>
-                  <p className="text-ui mt-1 whitespace-pre-line text-sm text-cypress/85">
+                  <div className="flex items-baseline justify-between">
+                    <p className="font-display text-lg text-ink">{c.signature}</p>
+                    <p className="text-xs text-muted">{formatDate(c.createdAt)}</p>
+                  </div>
+                  <p className="text-ui mt-3 whitespace-pre-line text-sm text-cypress/85">
                     {c.body}
                   </p>
-                  <p className="mt-2 text-xs text-muted">{formatDate(c.createdAt)}</p>
                 </li>
               ))}
             </ul>
           )}
 
-          <h3 className="heading-section mt-10 text-xl text-ink">Dodaj komentarz</h3>
+          <h3 className="font-display mt-12 text-2xl text-ink">
+            Dodaj komentarz
+          </h3>
+          <p className="text-motto mt-2 text-base">— lascia un commento —</p>
           <p className="text-ui mt-2 text-sm text-cypress/80">
             Komentarz pojawi się po moderacji.
           </p>
-          <div className="mt-4">
+          <div className="mt-5">
             <CommentForm postId={post.id} consentText={consentText} />
           </div>
         </section>

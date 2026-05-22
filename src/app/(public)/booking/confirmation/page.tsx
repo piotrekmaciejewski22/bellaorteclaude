@@ -1,15 +1,10 @@
-/**
- * `/booking/confirmation` — booking inquiry confirmation.
- *
- * Server Component. Reads `?ref=<inquiryId>` and shows a non-personal
- * summary. NEVER displays guest PII (Wym. 11, 42).
- *
- * Wymagania pokryte: 11.
- */
+export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
 
+import { OrnamentSimple } from '@/components/public/decorative/Ornament';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
 import { createServiceClient } from '@/lib/supabase/admin';
 
 interface PageProps {
@@ -57,8 +52,8 @@ async function loadSummary(ref: string | undefined): Promise<InquirySummary | nu
     const apartmentName = !a
       ? 'Apartament BELLAORTE'
       : Array.isArray(a)
-      ? a[0]?.name ?? 'Apartament BELLAORTE'
-      : a.name;
+        ? a[0]?.name ?? 'Apartament BELLAORTE'
+        : a.name;
     return {
       apartmentName,
       checkIn: row.check_in,
@@ -76,40 +71,47 @@ export default async function BookingConfirmationPage({ searchParams }: PageProp
   const summary = await loadSummary(params.ref);
 
   return (
-    <div className="bg-ivory">
-      <div className="mx-auto max-w-2xl px-6 py-20 text-center">
-        <div className="mx-auto inline-flex h-16 w-16 items-center justify-center rounded-full bg-soft-green text-italian-green">
-          <CheckCircle2 size={32} />
+    <div className="bg-crema">
+      <div className="mx-auto max-w-2xl px-6 py-24 text-center">
+        <div className="mx-auto inline-flex h-20 w-20 items-center justify-center rounded-full border border-gold bg-flag-white text-olive">
+          <CheckCircle2 size={36} strokeWidth={1.5} />
         </div>
 
-        <p className="text-eyebrow mt-6">Zapytanie wysłane</p>
-        <h1 className="heading-display mt-2 text-4xl text-ink md:text-5xl">
-          Dziękujemy.
+        <OrnamentSimple className="mx-auto mt-6 h-3 w-32 text-gold" />
+
+        <p className="text-eyebrow mt-6 text-gold">Zapytanie wysłane</p>
+        <h1 className="heading-display mt-3 text-4xl text-ink md:text-5xl">
+          Dziękujemy <span className="italic text-terracotta">serdecznie</span>
         </h1>
-        <p className="text-ui mt-4 text-cypress/80">
+        <p className="text-motto mt-3 text-lg">— grazie di cuore —</p>
+
+        <p className="text-ui mt-6 text-cypress/85">
           Twoje zapytanie zostało zapisane. Termin wymaga ręcznego
           potwierdzenia — odpowiedź otrzymasz mailem zwykle w ciągu 24 godzin.
         </p>
 
         {summary && (
-          <div className="mt-8 rounded-2xl border border-border bg-flag-white p-6 text-left">
-            <p className="text-eyebrow">Podsumowanie zapytania</p>
-            <dl className="mt-4 space-y-2 text-sm text-cypress">
-              <div className="flex justify-between">
-                <dt className="text-muted">Apartament</dt>
-                <dd>{summary.apartmentName}</dd>
+          <div className="mt-10 border border-gold/40 bg-flag-white p-7 text-left shadow-warm">
+            <div className="flex items-center justify-between">
+              <p className="text-eyebrow text-gold">Podsumowanie</p>
+              <TricoloreRule size="sm" />
+            </div>
+            <dl className="mt-4 space-y-3 text-sm text-cypress">
+              <div className="flex justify-between border-b border-gold/20 pb-2">
+                <dt className="text-stone">Apartament</dt>
+                <dd className="font-display italic">{summary.apartmentName}</dd>
+              </div>
+              <div className="flex justify-between border-b border-gold/20 pb-2">
+                <dt className="text-stone">Przyjazd</dt>
+                <dd className="font-display">{summary.checkIn}</dd>
+              </div>
+              <div className="flex justify-between border-b border-gold/20 pb-2">
+                <dt className="text-stone">Wyjazd</dt>
+                <dd className="font-display">{summary.checkOut}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-muted">Przyjazd</dt>
-                <dd>{summary.checkIn}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted">Wyjazd</dt>
-                <dd>{summary.checkOut}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted">Goście</dt>
-                <dd>
+                <dt className="text-stone">Goście</dt>
+                <dd className="font-display">
                   {summary.adults} {summary.adults === 1 ? 'dorosły' : 'dorosłych'}
                   {summary.children > 0 ? `, ${summary.children} dz.` : ''}
                 </dd>
@@ -118,18 +120,18 @@ export default async function BookingConfirmationPage({ searchParams }: PageProp
           </div>
         )}
 
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
+        <div className="mt-12 flex flex-wrap justify-center gap-3">
           <Link
             href="/"
-            className="rounded-full bg-italian-green px-6 py-3 text-sm font-semibold text-flag-white hover:bg-cypress"
+            className="border-2 border-olive bg-olive px-7 py-3 font-display text-base text-crema hover:bg-olive-deep"
           >
-            Wróć na stronę główną
+            <span className="text-gold-soft">·</span> Strona główna
           </Link>
           <Link
-            href="/apartments"
-            className="rounded-full border border-cypress/30 bg-flag-white px-6 py-3 text-sm font-semibold text-cypress hover:border-italian-green hover:text-italian-green"
+            href="/blog"
+            className="link-italic font-display italic text-terracotta hover:text-wine"
           >
-            Zobacz apartamenty
+            Zajrzyj na blog →
           </Link>
         </div>
       </div>

@@ -1,12 +1,5 @@
 "use client";
 
-/**
- * Error boundary for the public site.
- *
- * Logs the error server-side via Next.js streaming + console.error and
- * shows a friendly fallback. Wymaganie 3.
- */
-
 import { useEffect } from 'react';
 import Link from 'next/link';
 
@@ -21,28 +14,29 @@ export default function PublicError({ error, reset }: ErrorProps) {
   }, [error]);
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-24 text-center">
-      <p className="text-eyebrow">Błąd</p>
-      <h1 className="heading-display mt-2 text-4xl text-ink md:text-5xl">
-        Coś poszło nie tak
+    <div className="mx-auto max-w-2xl px-6 py-32 text-center">
+      <p className="text-eyebrow text-gold">Błąd</p>
+      <h1 className="heading-display mt-3 text-4xl text-ink md:text-5xl">
+        Coś poszło <span className="italic text-terracotta">nie tak</span>
       </h1>
-      <p className="text-ui mt-4 text-cypress/80">
+      <p className="text-motto mt-3 text-lg">— qualcosa è andato storto —</p>
+      <p className="text-ui mt-6 text-cypress/85">
         Spróbuj odświeżyć stronę. Jeżeli problem się powtarza, skontaktuj się
         z nami pod adresem podanym w stopce.
       </p>
-      <div className="mt-8 flex flex-wrap justify-center gap-3">
+      <div className="mt-10 flex flex-wrap justify-center gap-3">
         <button
           type="button"
           onClick={reset}
-          className="rounded-full bg-italian-green px-6 py-3 text-sm font-semibold text-flag-white hover:bg-cypress"
+          className="border-2 border-olive bg-olive px-7 py-3 font-display text-base text-crema hover:bg-olive-deep"
         >
-          Spróbuj ponownie
+          <span className="text-gold-soft">·</span> Spróbuj ponownie
         </button>
         <Link
           href="/"
-          className="rounded-full border border-cypress/30 bg-flag-white px-6 py-3 text-sm font-semibold text-cypress hover:border-italian-green hover:text-italian-green"
+          className="link-italic font-display italic text-terracotta hover:text-wine"
         >
-          Strona główna
+          Strona główna →
         </Link>
       </div>
     </div>

@@ -1,34 +1,31 @@
-/**
- * 404 page for the public site.
- *
- * Wymaganie 3 (404 z linkami nawigacyjnymi).
- */
-
 import Link from 'next/link';
+import { OrnamentSimple } from '@/components/public/decorative/Ornament';
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-2xl px-6 py-24 text-center">
-      <p className="text-eyebrow">404</p>
-      <h1 className="heading-display mt-2 text-5xl text-ink md:text-6xl">
+    <div className="mx-auto max-w-2xl px-6 py-32 text-center">
+      <p className="font-display text-7xl italic text-gold md:text-9xl">404</p>
+      <OrnamentSimple className="mx-auto mt-2 h-3 w-32 text-gold" />
+      <h1 className="heading-display mt-8 text-4xl text-ink md:text-5xl">
         Strona nie istnieje
       </h1>
-      <p className="text-ui mt-4 text-cypress/80">
-        Możliwe, że adres jest nieaktualny albo treść została przeniesiona.
-        Wróć na stronę główną lub zobacz apartamenty.
+      <p className="text-motto mt-3 text-lg">— pagina non trovata —</p>
+      <p className="text-ui mt-6 text-cypress/85">
+        Adres mógł się zmienić albo treść została przeniesiona. Wróć na stronę
+        główną lub zobacz nasze apartamenty.
       </p>
-      <div className="mt-8 flex flex-wrap justify-center gap-3">
+      <div className="mt-10 flex flex-wrap justify-center gap-3">
         <Link
           href="/"
-          className="rounded-full bg-italian-green px-6 py-3 text-sm font-semibold text-flag-white hover:bg-cypress"
+          className="border-2 border-olive bg-olive px-7 py-3 font-display text-base text-crema hover:bg-olive-deep"
         >
-          Strona główna
+          <span className="text-gold-soft">·</span> Strona główna
         </Link>
         <Link
           href="/apartments"
-          className="rounded-full border border-cypress/30 bg-flag-white px-6 py-3 text-sm font-semibold text-cypress hover:border-italian-green hover:text-italian-green"
+          className="link-italic font-display italic text-terracotta hover:text-wine"
         >
-          Apartamenty
+          Zobacz apartamenty →
         </Link>
       </div>
     </div>

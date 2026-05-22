@@ -1,15 +1,14 @@
 export const dynamic = 'force-dynamic';
 
-/**
- * `/wasze-zdjecia` — galeria od gości i znajomych.
- */
-
 import { createServerClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/admin';
 import { getApprovedCommunityPhotosWithUrls } from '@/lib/data/community-photos';
 import { getSiteSettings } from '@/lib/data/settings';
 import { CommunityGallery } from '@/components/public/CommunityGallery';
 import { CommunityPhotoUploader } from '@/components/public/CommunityPhotoUploader';
+import { SectionDivider } from '@/components/public/decorative/SectionDivider';
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
+import { OliveBranchIcon } from '@/components/public/decorative/ItalianIcons';
 
 const FALLBACK_CONSENT =
   'Oświadczam, że posiadam prawa do wgrywanego zdjęcia i wyrażam zgodę na jego publikację po zatwierdzeniu.';
@@ -19,8 +18,6 @@ export default async function CommunityPhotosPage() {
   let consentText = FALLBACK_CONSENT;
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     try {
-      // Service role do generowania signed URL z prywatnego bucketa
-      // guest-media. Anon nie zobaczy klucza — wszystko jest serwerowe.
       const adminClient = createServiceClient();
       photos = await getApprovedCommunityPhotosWithUrls(adminClient);
 
@@ -33,33 +30,45 @@ export default async function CommunityPhotosPage() {
   }
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <p className="text-eyebrow">Galeria gości</p>
-        <h1 className="heading-display mt-2 text-5xl text-ink md:text-6xl">
-          Wasze zdjęcia
-        </h1>
-        <p className="text-ui mt-6 max-w-2xl text-cypress/80">
+        <div className="flex items-center gap-3">
+          <span className="text-eyebrow text-gold">Galeria gości</span>
+          <TricoloreRule size="md" />
+        </div>
+
+        <div className="mt-5 flex items-end gap-4">
+          <OliveBranchIcon size={42} className="text-olive shrink-0" />
+          <h1 className="heading-display text-5xl text-ink md:text-7xl">
+            Wasze <span className="italic text-terracotta">zdjęcia</span>
+          </h1>
+        </div>
+        <p className="text-motto mt-3 text-lg md:text-xl">— il viaggio è meglio condiviso —</p>
+
+        <p className="text-ui mt-6 max-w-2xl text-cypress/85">
           Zdjęcia od gości i znajomych — z apartamentu, z Orte, z wycieczek po
           regionie. Każde czeka na moderację, więc daj nam chwilę.
         </p>
 
-        <div className="mt-10 max-w-2xl">
-          <CommunityPhotoUploader consentText={consentText} />
-        </div>
+        <SectionDivider motto="grazie per condividere" />
 
-        <section className="mt-14">
-          <CommunityGallery
-            photos={photos.map((p) => ({
-              id: p.id,
-              signedUrl: p.signedUrl,
-              caption: p.caption,
-              contributorName: p.contributorName,
-              locationLabel: p.locationLabel,
-              createdAt: p.createdAt,
-            }))}
-          />
-        </section>
+        <div className="grid gap-12 lg:grid-cols-[1fr,2fr]">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <CommunityPhotoUploader consentText={consentText} />
+          </div>
+          <div>
+            <CommunityGallery
+              photos={photos.map((p) => ({
+                id: p.id,
+                signedUrl: p.signedUrl,
+                caption: p.caption,
+                contributorName: p.contributorName,
+                locationLabel: p.locationLabel,
+                createdAt: p.createdAt,
+              }))}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,16 +1,9 @@
 export const dynamic = 'force-dynamic';
 
-/**
- * `/privacy` — privacy policy.
- *
- * Renders `site_settings.privacy_policy_md` as Markdown. If Supabase is
- * not configured, falls back to a stub note.
- *
- * Wymagania pokryte: 43.
- */
-
 import ReactMarkdown from 'react-markdown';
 
+import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
+import { OrnamentSimple } from '@/components/public/decorative/Ornament';
 import { createServerClient } from '@/lib/supabase/server';
 
 const FALLBACK_MD = `# Polityka prywatności
@@ -43,10 +36,14 @@ export default async function PrivacyPage() {
   const md = await loadPrivacyMd();
 
   return (
-    <div className="bg-ivory">
+    <div className="bg-crema">
       <div className="mx-auto max-w-3xl px-6 py-16">
-        <p className="text-eyebrow">Dokumenty prawne</p>
-        <article className="markdown-body mt-4">
+        <div className="flex items-center gap-3">
+          <span className="text-eyebrow text-gold">Dokumenty prawne</span>
+          <TricoloreRule size="md" />
+        </div>
+        <OrnamentSimple className="mt-6 h-3 w-32 text-gold" />
+        <article className="markdown-body mt-8">
           <ReactMarkdown>{md}</ReactMarkdown>
         </article>
       </div>
