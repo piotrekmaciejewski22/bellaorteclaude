@@ -25,3 +25,6 @@ Thumbs.db
 
 # types
 next-env.d.ts
+
+# Lokalne pliki dla skryptów seedowania (nie commitowane do repo)
+/scripts/blog-photos
