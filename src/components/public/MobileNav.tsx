@@ -3,14 +3,16 @@
 /**
  * MobileNav — hamburger menu for the public site below 768 px.
  *
- * Client Component. Renders a button that opens a full-screen overlay
- * with the same nav links as `SiteHeader`. Closes on link click and on
- * Escape. Visible only on `md` breakpoint and below.
+ * Client Component. Otwarte menu jest renderowane przez React Portal
+ * bezpośrednio w `<body>`, żeby było ZAWSZE na wierzchu — niezależnie
+ * od stacking contextów stworzonych przez `isolate` na hero (Image
+ * z position absolute) lub innymi sekcjami.
  *
  * Wymaganie 47 #2 (responsive nav).
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
@@ -23,18 +25,28 @@ interface MobileNavProps {
   links: ReadonlyArray<MobileNavLink>;
 }
 
+// Wykrywanie hydration bez useEffect+setState — useSyncExternalStore
+// zwraca server snapshot na SSR (false) i client snapshot po hydration (true).
+const subscribe = () => () => undefined;
+function useIsClient(): boolean {
+  return useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+}
+
 export function MobileNav({ links }: MobileNavProps) {
   const [open, setOpen] = useState(false);
+  const isClient = useIsClient();
 
   useEffect(() => {
     if (!open) return;
-
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
-
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
@@ -53,34 +65,62 @@ export function MobileNav({ links }: MobileNavProps) {
         {open ? <X size={22} /> : <Menu size={22} />}
       </button>
 
-      {open && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menu mobilne"
-          className="fixed bottom-0 left-0 right-0 top-20 z-50 flex flex-col gap-2 overflow-y-auto overscroll-contain bg-crema px-6 py-8 shadow-2xl"
-        >
-          <nav aria-label="Nawigacja mobilna" className="flex flex-col gap-1 pb-12">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="block border-b border-gold/20 px-2 py-4 font-display text-2xl italic text-cypress active:bg-gold/10"
-              >
-                {link.label}
-              </Link>
-            ))}
-            <Link
-              href="/booking"
-              onClick={() => setOpen(false)}
-              className="mt-6 block border-2 border-olive bg-olive px-6 py-4 text-center font-display italic text-crema active:bg-olive-deep"
+      {isClient && open
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menu mobilne"
+              // z-[9999] żeby przykrył wszystko — mapy Leaflet/Google ustawiają
+              // własne wysokie z-index, więc używamy bardzo wysokiego.
+              className="fixed inset-0 z-[9999] flex flex-col overflow-y-auto overscroll-contain bg-crema"
+              style={{
+                paddingTop: "env(safe-area-inset-top)",
+                paddingBottom: "env(safe-area-inset-bottom)",
+              }}
             >
-              <span className="text-gold-soft">·</span> Rezerwacja
-            </Link>
-          </nav>
-        </div>
-      )}
+              {/* Pasek z X w prawym górnym rogu */}
+              <div className="flex h-20 items-center justify-between border-b border-gold/20 px-6">
+                <span className="font-display text-xl text-ink">
+                  <span className="text-italian-green">BELLA</span>
+                  <span className="text-terracotta">ORTE</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Zamknij menu"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full text-cypress active:bg-soft-green"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <nav
+                aria-label="Nawigacja mobilna"
+                className="flex flex-col gap-1 px-6 py-6"
+              >
+                {links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className="block border-b border-gold/20 px-2 py-4 font-display text-2xl italic text-cypress active:bg-gold/10"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <Link
+                  href="/booking"
+                  onClick={() => setOpen(false)}
+                  className="mt-6 block border-2 border-olive bg-olive px-6 py-4 text-center font-display text-lg italic text-crema active:bg-olive-deep"
+                >
+                  <span className="text-gold-soft">·</span> Rezerwacja
+                </Link>
+              </nav>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
