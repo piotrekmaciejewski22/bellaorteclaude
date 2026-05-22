@@ -85,7 +85,11 @@ export function PlacesMap({ places }: PlacesMapProps) {
   const [filterRegion, setFilterRegion] = useState<'all' | Place['region']>('all');
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
+  // Tymczasowo wyłączamy Google Maps mapę bo wymaga aktywnego Maps
+  // JavaScript API w Google Cloud Console + skonfigurowanego mapId.
+  // Bez tego renderowanie crashuje runtime. Leaflet/OpenStreetMap jest
+  // darmowe, bez klucza i wygląda profesjonalnie.
+  const googleApiKey = undefined;
 
   const filtered = useMemo(() => {
     return places.filter((p) => {
