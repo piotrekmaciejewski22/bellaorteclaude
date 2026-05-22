@@ -13,6 +13,8 @@ import { TricoloreRule } from "@/components/public/decorative/TricoloreRule";
 const NAV_LINKS = [
   { href: "/apartments", label: "Apartamenty" },
   { href: "/guide", label: "Przewodnik" },
+  { href: "/wydarzenia", label: "Wydarzenia" },
+  { href: "/mapa", label: "Mapa" },
   { href: "/blog", label: "Blog" },
   { href: "/wasze-zdjecia", label: "Wasze zdjęcia" },
   { href: "/rome", label: "Rzym" },

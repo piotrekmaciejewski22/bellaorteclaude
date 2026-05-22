@@ -136,7 +136,7 @@ insert into public.events (id, kind, title, excerpt, body_md, start_date, end_da
     'seasonal',
     'Wczesna jesień — najlepszy moment',
     'Wrzesień i pierwsza połowa października. Mniej tłumów, jedzenie w pełnym sezonie, idealna pogoda.',
-    E'## Dlaczego jesień\n\nNasi stali goście wracają najczęściej w połowie września. Powody są dwa: pogoda i jedzenie.\n\n## Pogoda\n\n- 22-26°C w dzień, 14-18°C w nocy\n- Średnio 4-5 deszczowych dni w miesiącu\n- Wieczory na tarasie wciąż możliwe do połowy października\n\n## Jedzenie\n\nWrzesień to początek sezonu na:\n- Białe trufle z Acqualagna (od początku października)\n- Borowiki z lasów wokół Bomarzo\n- Pierwsze kasztany\n- Świeży moszcz winogronowy w okolicznych winnicach\n\n## Wydarzenia\n\nSagra delle Castagne w Soriano, vendemmia (winobranie) w okolicznych winnicach (zwykle pierwsza dekada września), Festa dell\\'Uva w niektórych wioskach.',
+    E'## Dlaczego jesień\n\nNasi stali goście wracają najczęściej w połowie września. Powody są dwa: pogoda i jedzenie.\n\n## Pogoda\n\n- 22-26°C w dzień, 14-18°C w nocy\n- Średnio 4-5 deszczowych dni w miesiącu\n- Wieczory na tarasie wciąż możliwe do połowy października\n\n## Jedzenie\n\nWrzesień to początek sezonu na:\n- Białe trufle z Acqualagna (od początku października)\n- Borowiki z lasów wokół Bomarzo\n- Pierwsze kasztany\n- Świeży moszcz winogronowy w okolicznych winnicach\n\n## Wydarzenia\n\nSagra delle Castagne w Soriano, vendemmia (winobranie) w okolicznych winnicach (zwykle pierwsza dekada września), Festa dell''Uva w niektórych wioskach.',
     (now() + interval '90 days')::date,
     (now() + interval '150 days')::date,
     'Wrzesień — Październik',

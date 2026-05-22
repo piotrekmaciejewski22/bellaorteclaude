@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic';
 
 import { SectionDivider } from '@/components/public/decorative/SectionDivider';
 import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
-import { MapEmbed } from '@/components/public/MapEmbed';
 import { PlacesMap } from '@/components/public/PlacesMap';
 import { createServerClient } from '@/lib/supabase/server';
 import { getRestaurants } from '@/lib/data/restaurants';

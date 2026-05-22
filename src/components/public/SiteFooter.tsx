@@ -14,6 +14,8 @@ import { BellaorteSeal } from "@/components/public/decorative/BellaorteSeal";
 const FOOTER_NAV_LEFT = [
   { href: "/apartments", label: "Apartamenty" },
   { href: "/guide", label: "Przewodnik" },
+  { href: "/wydarzenia", label: "Wydarzenia" },
+  { href: "/mapa", label: "Mapa" },
   { href: "/blog", label: "Blog" },
   { href: "/wasze-zdjecia", label: "Wasze zdjęcia" },
 ] as const;

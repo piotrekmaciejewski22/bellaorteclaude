@@ -22,6 +22,7 @@ import {
   Newspaper,
   MessagesSquare,
   Camera,
+  Sparkles,
 } from 'lucide-react';
 
 const NAV = [
@@ -32,6 +33,7 @@ const NAV = [
   { href: '/admin/restaurants', label: 'Restauracje', icon: UtensilsCrossed },
   { href: '/admin/places', label: 'Atrakcje', icon: Map },
   { href: '/admin/rome', label: 'Rzym', icon: Compass },
+  { href: '/admin/events', label: 'Wydarzenia / sezony', icon: Sparkles },
   { href: '/admin/blog', label: 'Blog', icon: Newspaper },
   { href: '/admin/blog-comments', label: 'Komentarze bloga', icon: MessagesSquare },
   { href: '/admin/community-photos', label: 'Wasze zdjęcia', icon: Camera },
