@@ -58,25 +58,27 @@ export function MobileNav({ links }: MobileNavProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Menu mobilne"
-          className="fixed inset-0 top-20 z-30 flex flex-col gap-2 overflow-y-auto bg-crema px-6 py-10"
+          className="fixed bottom-0 left-0 right-0 top-20 z-50 flex flex-col gap-2 overflow-y-auto overscroll-contain bg-crema px-6 py-8 shadow-2xl"
         >
-          {links.map((link) => (
+          <nav aria-label="Nawigacja mobilna" className="flex flex-col gap-1 pb-12">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="block border-b border-gold/20 px-2 py-4 font-display text-2xl italic text-cypress active:bg-gold/10"
+              >
+                {link.label}
+              </Link>
+            ))}
             <Link
-              key={link.href}
-              href={link.href}
+              href="/booking"
               onClick={() => setOpen(false)}
-              className="block px-4 py-4 font-display text-2xl italic text-cypress hover:text-terracotta"
+              className="mt-6 block border-2 border-olive bg-olive px-6 py-4 text-center font-display italic text-crema active:bg-olive-deep"
             >
-              {link.label}
+              <span className="text-gold-soft">·</span> Rezerwacja
             </Link>
-          ))}
-          <Link
-            href="/booking"
-            onClick={() => setOpen(false)}
-            className="mt-4 block border border-gold bg-transparent px-6 py-4 text-center font-display italic text-cypress hover:bg-gold/10"
-          >
-            <span className="text-gold">·</span> Rezerwacja
-          </Link>
+          </nav>
         </div>
       )}
     </div>
