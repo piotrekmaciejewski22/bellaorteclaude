@@ -79,3 +79,73 @@ export async function DELETE(
 
   return NextResponse.json({ ok: true });
 }
+
+interface PatchBody {
+  displayOrder?: number;
+  alt?: string;
+  sourceKind?: string;
+}
+
+const SOURCE_KINDS = [
+  'placeholder_orte',
+  'placeholder_italy',
+  'placeholder_rome',
+  'interior_real',
+  'exterior_real',
+] as const;
+
+export async function PATCH(
+  request: Request,
+  context: { params: Promise<{ id: string; photoId: string }> },
+) {
+  const guard = await requireAdmin();
+  if (guard instanceof NextResponse) return guard;
+
+  const { id: apartmentId, photoId } = await context.params;
+  if (!UUID_RE.test(apartmentId) || !UUID_RE.test(photoId)) {
+    return NextResponse.json(
+      { error: 'Nieprawidłowy identyfikator' },
+      { status: 400 },
+    );
+  }
+
+  let body: PatchBody;
+  try {
+    body = (await request.json()) as PatchBody;
+  } catch {
+    return NextResponse.json({ error: 'Nieprawidłowy JSON' }, { status: 400 });
+  }
+
+  const update: Record<string, unknown> = {};
+  if (typeof body.displayOrder === 'number') update.display_order = body.displayOrder;
+  if (typeof body.alt === 'string') update.alt = body.alt;
+  if (
+    typeof body.sourceKind === 'string' &&
+    (SOURCE_KINDS as readonly string[]).includes(body.sourceKind)
+  ) {
+    update.source_kind = body.sourceKind;
+  }
+
+  if (Object.keys(update).length === 0) {
+    return NextResponse.json({ error: 'Brak pól do zmiany' }, { status: 400 });
+  }
+
+  const client = createServiceClient();
+  const { error } = await client
+    .from('gallery_photos')
+    .update(update)
+    .eq('id', photoId)
+    .eq('apartment_id', apartmentId);
+
+  if (error) {
+    return NextResponse.json(
+      { error: `Nie udało się zapisać: ${error.message}` },
+      { status: 500 },
+    );
+  }
+
+  revalidatePath('/apartments');
+  revalidatePath(`/admin/apartments/${apartmentId}`);
+  revalidatePath('/');
+  return NextResponse.json({ ok: true });
+}

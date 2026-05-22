@@ -1,6 +1,5 @@
 /**
- * `PATCH /api/admin/blog/[id]` — edit a blog post.
- * `DELETE /api/admin/blog/[id]` — delete a blog post.
+ * `PATCH/DELETE /api/admin/faq/[id]` — edit or remove FAQ item.
  */
 
 import { NextResponse } from 'next/server';
@@ -11,17 +10,12 @@ import { createServiceClient } from '@/lib/supabase/admin';
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 interface PatchBody {
-  slug?: string;
-  title?: string;
-  excerpt?: string;
-  bodyMd?: string;
-  authorSignature?: string;
-  heroImagePath?: string | null;
+  question?: string;
+  answerMd?: string;
+  displayOrder?: number;
   published?: boolean;
-  tags?: string[];
 }
 
 export async function PATCH(
@@ -44,25 +38,9 @@ export async function PATCH(
   }
 
   const update: Record<string, unknown> = {};
-  if (body.slug !== undefined) {
-    if (!SLUG_RE.test(body.slug)) {
-      return NextResponse.json(
-        { errors: [{ field: 'slug', message: 'Slug w formacie kebab-case' }] },
-        { status: 400 },
-      );
-    }
-    update.slug = body.slug;
-  }
-  if (body.title !== undefined) update.title = body.title;
-  if (body.excerpt !== undefined) update.excerpt = body.excerpt;
-  if (body.bodyMd !== undefined) update.body_md = body.bodyMd;
-  if (body.authorSignature !== undefined) update.author_signature = body.authorSignature;
-  if (body.heroImagePath !== undefined) update.hero_image_path = body.heroImagePath;
-  if (Array.isArray(body.tags)) {
-    update.tags = body.tags
-      .map((t) => String(t).trim().toLowerCase())
-      .filter((t) => t.length > 0 && t.length <= 32);
-  }
+  if (body.question !== undefined) update.question = body.question;
+  if (body.answerMd !== undefined) update.answer_md = body.answerMd;
+  if (body.displayOrder !== undefined) update.display_order = body.displayOrder;
   if (typeof body.published === 'boolean') {
     update.published_at = body.published ? new Date().toISOString() : null;
   }
@@ -72,22 +50,16 @@ export async function PATCH(
   }
 
   const client = createServiceClient();
-  const { error } = await client.from('blog_posts').update(update).eq('id', id);
+  const { error } = await client.from('faq_items').update(update).eq('id', id);
   if (error) {
-    if (error.code === '23505') {
-      return NextResponse.json(
-        { errors: [{ field: 'slug', message: 'Slug jest już zajęty' }] },
-        { status: 400 },
-      );
-    }
     return NextResponse.json(
       { error: `Nie udało się zapisać: ${error.message}` },
       { status: 500 },
     );
   }
 
-  revalidatePath('/blog', 'layout');
-  revalidatePath('/admin/blog');
+  revalidatePath('/useful-info');
+  revalidatePath('/admin/faq');
   return NextResponse.json({ ok: true });
 }
 
@@ -104,15 +76,15 @@ export async function DELETE(
   }
 
   const client = createServiceClient();
-  const { error } = await client.from('blog_posts').delete().eq('id', id);
+  const { error } = await client.from('faq_items').delete().eq('id', id);
   if (error) {
     return NextResponse.json(
-      { error: `Nie udało się usunąć wpisu: ${error.message}` },
+      { error: `Usunięcie nie powiodło się: ${error.message}` },
       { status: 500 },
     );
   }
 
-  revalidatePath('/blog', 'layout');
-  revalidatePath('/admin/blog');
+  revalidatePath('/useful-info');
+  revalidatePath('/admin/faq');
   return NextResponse.json({ ok: true });
 }

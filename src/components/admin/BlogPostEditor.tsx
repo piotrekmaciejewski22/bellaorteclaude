@@ -27,6 +27,7 @@ export function BlogPostEditor({ post, heroUrl }: BlogPostEditorProps) {
   const [excerpt, setExcerpt] = useState(post?.excerpt ?? '');
   const [bodyMd, setBodyMd] = useState(post?.bodyMd ?? '');
   const [authorSignature, setAuthorSignature] = useState(post?.authorSignature ?? '');
+  const [tagsText, setTagsText] = useState((post?.tags ?? []).join(', '));
   const [published, setPublished] = useState<boolean>(post?.publishedAt !== null && post?.publishedAt !== undefined);
   const [heroPath, setHeroPath] = useState<string | null>(post?.heroImagePath ?? null);
   const [currentHeroUrl, setCurrentHeroUrl] = useState<string | null>(heroUrl ?? null);
@@ -102,6 +103,10 @@ export function BlogPostEditor({ post, heroUrl }: BlogPostEditorProps) {
       authorSignature: authorSignature.trim(),
       heroImagePath: heroPath,
       published,
+      tags: tagsText
+        .split(/[,\n]/)
+        .map((t) => t.trim().toLowerCase())
+        .filter(Boolean),
     };
 
     if (!payload.slug) {
@@ -191,6 +196,19 @@ export function BlogPostEditor({ post, heroUrl }: BlogPostEditorProps) {
         <div>
           <label htmlFor="authorSignature" className="block text-sm font-medium text-cypress">Podpis autora</label>
           <input id="authorSignature" type="text" value={authorSignature} onChange={(e) => setAuthorSignature(e.target.value)} className="mt-1 w-full rounded-lg border border-border bg-ivory px-3 py-2 text-ink" />
+        </div>
+
+        <div>
+          <label htmlFor="tags" className="block text-sm font-medium text-cypress">Tagi (po przecinku)</label>
+          <input
+            id="tags"
+            type="text"
+            value={tagsText}
+            onChange={(e) => setTagsText(e.target.value)}
+            placeholder="np. orte, jedzenie, wycieczki"
+            className="mt-1 w-full rounded-lg border border-border bg-ivory px-3 py-2 text-ink"
+          />
+          <p className="mt-1 text-xs text-muted">Tagi pomagają gościom filtrować bloga. Małe litery, bez spacji.</p>
         </div>
 
         <label className="flex items-center gap-3 text-sm text-cypress">

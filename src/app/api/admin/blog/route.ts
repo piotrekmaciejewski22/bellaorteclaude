@@ -18,6 +18,7 @@ interface CreateBody {
   authorSignature?: string;
   heroImagePath?: string | null;
   published?: boolean;
+  tags?: string[];
 }
 
 export async function POST(request: Request) {
@@ -43,6 +44,9 @@ export async function POST(request: Request) {
   }
 
   const client = createServiceClient();
+  const tags = Array.isArray(body.tags)
+    ? body.tags.map((t) => String(t).trim().toLowerCase()).filter((t) => t.length > 0 && t.length <= 32)
+    : [];
   const insert = await client
     .from('blog_posts')
     .insert({
@@ -52,6 +56,7 @@ export async function POST(request: Request) {
       body_md: body.bodyMd ?? '',
       author_signature: body.authorSignature ?? '',
       hero_image_path: body.heroImagePath ?? null,
+      tags,
       published_at: body.published ? new Date().toISOString() : null,
     })
     .select('id, slug')

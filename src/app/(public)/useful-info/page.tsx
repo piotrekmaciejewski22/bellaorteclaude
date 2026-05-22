@@ -5,8 +5,10 @@ import { ExternalLink } from 'lucide-react';
 import { SectionDivider } from '@/components/public/decorative/SectionDivider';
 import { RomanBadge } from '@/components/public/decorative/RomanBadge';
 import { TricoloreRule } from '@/components/public/decorative/TricoloreRule';
+import { FaqAccordion } from '@/components/public/FaqAccordion';
 import { createServerClient } from '@/lib/supabase/server';
 import { getTravelInfo, TRAVEL_INFO_KIND_PL } from '@/lib/data/travel-info';
+import { getFaqItems, type FaqItem } from '@/lib/data/faq';
 import type { TravelInfo, TravelInfoKind } from '@/lib/types';
 
 const ORDER: TravelInfoKind[] = [
@@ -25,13 +27,17 @@ const ROMAN_FOR_KIND: Record<TravelInfoKind, 'I' | 'II' | 'III' | 'IV'> = {
 
 export default async function UsefulInfoPage() {
   let entries: TravelInfo[] = [];
+  let faqItems: FaqItem[] = [];
   if (
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   ) {
     try {
       const client = await createServerClient();
-      entries = await getTravelInfo(client);
+      [entries, faqItems] = await Promise.all([
+        getTravelInfo(client),
+        getFaqItems(client).catch(() => []),
+      ]);
     } catch (err) {
       console.warn('useful-info: fallback empty:', err);
     }
@@ -110,6 +116,23 @@ export default async function UsefulInfoPage() {
               </section>
             ))}
           </div>
+        )}
+
+        {faqItems.length > 0 && (
+          <section className="mt-16">
+            <SectionDivider motto="domande frequenti" />
+            <div className="flex items-center gap-4">
+              <RomanBadge numeral="V" size="md" variant="gold" />
+              <h2 className="heading-section text-2xl text-ink md:text-4xl">
+                Najczęściej zadawane <span className="italic text-olive">pytania</span>
+              </h2>
+            </div>
+            <p className="text-motto mt-3 text-lg">— le risposte rapide —</p>
+
+            <div className="mt-8">
+              <FaqAccordion items={faqItems} />
+            </div>
+          </section>
         )}
       </div>
     </div>

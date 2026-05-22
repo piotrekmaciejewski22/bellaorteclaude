@@ -23,6 +23,8 @@ import {
   MessagesSquare,
   Camera,
   Sparkles,
+  HelpCircle,
+  ShoppingBag,
 } from 'lucide-react';
 
 const NAV = [
@@ -39,6 +41,8 @@ const NAV = [
   { href: '/admin/community-photos', label: 'Wasze zdjęcia', icon: Camera },
   { href: '/admin/reviews', label: 'Opinie', icon: MessageSquare },
   { href: '/admin/photos', label: 'Zdjęcia restauracji/atrakcji', icon: ImageIcon },
+  { href: '/admin/faq', label: 'FAQ', icon: HelpCircle },
+  { href: '/admin/local-services', label: 'Dla gości', icon: ShoppingBag },
   { href: '/admin/settings', label: 'Ustawienia', icon: Settings },
 ] as const;
 

@@ -17,6 +17,7 @@ export interface BlogPost {
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  tags: string[];
 }
 
 export interface BlogComment {
@@ -39,6 +40,7 @@ interface PostRow {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  tags?: string[];
 }
 
 interface CommentRow {
@@ -51,7 +53,7 @@ interface CommentRow {
 }
 
 const POST_COLUMNS =
-  'id, slug, title, excerpt, body_md, hero_image_path, author_signature, published_at, created_at, updated_at';
+  'id, slug, title, excerpt, body_md, hero_image_path, author_signature, published_at, created_at, updated_at, tags';
 
 function mapPost(row: PostRow): BlogPost {
   return {
@@ -65,6 +67,7 @@ function mapPost(row: PostRow): BlogPost {
     publishedAt: row.published_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    tags: row.tags ?? [],
   };
 }
 

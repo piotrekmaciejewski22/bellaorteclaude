@@ -11,6 +11,7 @@ import Image from "next/image";
 import { ArrowRight, Newspaper } from "lucide-react";
 import { HeroSection } from "@/components/public/HeroSection";
 import { ApartmentCard } from "@/components/public/ApartmentCard";
+import { PublicAvailability } from "@/components/public/PublicAvailability";
 import { SectionDivider } from "@/components/public/decorative/SectionDivider";
 import { RomanBadge } from "@/components/public/decorative/RomanBadge";
 import { TuscanyMap } from "@/components/public/decorative/TuscanyMap";
@@ -28,9 +29,14 @@ import {
 } from "@/lib/mock-data";
 import { createServerClient } from "@/lib/supabase/server";
 import { getSiteSettings } from "@/lib/data/settings";
-import { publicSiteMediaUrl, getApartments } from "@/lib/data/apartments";
+import { publicSiteMediaUrl, getApartments, getApartmentGallery, filterDisplayablePhotos } from "@/lib/data/apartments";
 import { getBlogPosts, type BlogPost } from "@/lib/data/blog";
 import { getApprovedCommunityPhotosWithUrls } from "@/lib/data/community-photos";
+import { getRecentApprovedReviews } from "@/lib/data/reviews";
+import { getRestaurants } from "@/lib/data/restaurants";
+import { getAttractions } from "@/lib/data/attractions";
+import { TestimonialsSection } from "@/components/public/TestimonialsSection";
+import type { Review } from "@/lib/types";
 import { createServiceClient } from "@/lib/supabase/admin";
 
 const GUIDE_LINKS = [
@@ -78,8 +84,13 @@ export const dynamic = 'force-dynamic';
 export default async function HomePage() {
   let heroUrl: string | null = null;
   let apartments: typeof MOCK_APARTMENTS = MOCK_APARTMENTS;
+  // Mapa slug → pierwsze zdjęcie galerii apartamentu (interior_real lub placeholder).
+  const apartmentHeroByslug: Record<string, string> = {};
   let posts: BlogPost[] = [];
   let communityPhotos: { id: string; signedUrl: string; caption: string }[] = [];
+  let recentReviews: Review[] = [];
+  const restaurantMap = new Map<string, { slug: string; name: string }>();
+  const attractionMap = new Map<string, { slug: string; name: string }>();
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     try {
@@ -92,7 +103,35 @@ export default async function HomePage() {
       const apts = await getApartments(client);
       if (apts.length > 0) apartments = apts;
 
+      // Pobierz pierwsze zdjęcie z galerii każdego apartamentu — to to,
+      // które admin zarządza w `/admin/apartments/[id]`.
+      for (const apt of apts) {
+        try {
+          const photos = await getApartmentGallery(client, apt.id);
+          const filtered = filterDisplayablePhotos(photos);
+          if (filtered.length > 0) {
+            apartmentHeroByslug[apt.slug] = publicSiteMediaUrl(filtered[0].storagePath);
+          }
+        } catch (err) {
+          console.warn(`gallery for ${apt.slug}:`, err);
+        }
+      }
+
       posts = await getBlogPosts(client, { limit: 3 });
+
+      // Opinie + lookupy do linkowania w sekcji „Co mówią goście"
+      try {
+        const [reviews, restaurants, attractions] = await Promise.all([
+          getRecentApprovedReviews(client, 6),
+          getRestaurants(client),
+          getAttractions(client),
+        ]);
+        recentReviews = reviews;
+        for (const r of restaurants) restaurantMap.set(r.id, { slug: r.slug, name: r.name });
+        for (const a of attractions) attractionMap.set(a.id, { slug: a.slug, name: a.name });
+      } catch (err) {
+        console.warn('home reviews:', err);
+      }
     } catch (err) {
       console.warn("home: fallback partial:", err);
     }
@@ -150,7 +189,9 @@ export default async function HomePage() {
               key={apartment.id}
               apartment={apartment}
               heroSrc={
-                MOCK_APARTMENT_HERO[apartment.slug] ?? "/placeholders/orte-1.svg"
+                apartmentHeroByslug[apartment.slug] ??
+                MOCK_APARTMENT_HERO[apartment.slug] ??
+                "/placeholders/orte-1.svg"
               }
               nextAvailability={MOCK_NEXT_AVAILABLE[apartment.slug]}
               numeral={idx === 0 ? "I" : "II"}
@@ -296,6 +337,14 @@ export default async function HomePage() {
       )}
 
       {/* ───── V. WASZE ZDJĘCIA ───────────────────────────── */}
+      {recentReviews.length > 0 && (
+        <TestimonialsSection
+          reviews={recentReviews}
+          restaurants={restaurantMap}
+          attractions={attractionMap}
+        />
+      )}
+
       {communityPhotos.length > 0 && (
         <>
           <SectionDivider motto="il viaggio è meglio condiviso" className="mx-auto max-w-6xl px-6" />
@@ -419,23 +468,39 @@ export default async function HomePage() {
       {/* ───── DOSTĘPNOŚĆ — finalny CTA ─────────────────────── */}
       <SectionDivider motto="vi aspettiamo" className="mx-auto max-w-6xl px-6" />
 
-      <section className="mx-auto max-w-3xl px-6 pb-24 pt-4 text-center">
-        <p className="text-eyebrow text-gold">Dostępność</p>
-        <h2 className="heading-section mt-3 text-4xl text-ink md:text-5xl">
-          Termin sprawdzasz w <span className="italic text-olive">trzydzieści sekund</span>.
-        </h2>
-        <p className="text-ui mt-5 text-cypress/85">
-          Kalendarz pokazuje, kiedy apartament jest wolny. Zapytanie wysyłasz
-          przez formularz — odpowiadamy mailem, bez płatności online.
-        </p>
-        <Link
-          href="/booking"
-          className="group mt-10 inline-flex items-center gap-3 border-2 border-olive bg-olive px-9 py-4 font-display text-base text-crema shadow-warm transition-all hover:border-olive-deep hover:bg-olive-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-        >
-          <span className="text-gold-soft">·</span>
-          <span>Otwórz kalendarz</span>
-          <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
-        </Link>
+      <section className="mx-auto max-w-6xl px-6 pb-20 pt-4" aria-labelledby="dostepnosc-heading">
+        <div className="text-center">
+          <p className="text-eyebrow text-gold">Dostępność</p>
+          <h2
+            id="dostepnosc-heading"
+            className="heading-section mt-3 text-4xl text-ink md:text-5xl"
+          >
+            Termin sprawdzasz <span className="italic text-olive">w trzydzieści sekund</span>.
+          </h2>
+          <p className="text-motto mt-3 text-lg">— controlla la disponibilità —</p>
+          <p className="text-ui mt-5 text-cypress/85">
+            Kalendarz pokazuje, kiedy każdy apartament jest wolny.
+            Kliknij dzień żeby przejść do formularza zapytania —
+            odpowiadamy mailem ręcznie, bez płatności online.
+          </p>
+        </div>
+
+        <div className="mt-10">
+          <PublicAvailability
+            apartments={apartments.map((a) => ({ id: a.id, slug: a.slug, name: a.name }))}
+          />
+        </div>
+
+        <div className="mt-10 text-center">
+          <Link
+            href="/booking"
+            className="group inline-flex items-center gap-3 border-2 border-olive bg-olive px-9 py-4 font-display text-base text-crema shadow-warm transition-all hover:border-olive-deep hover:bg-olive-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+          >
+            <span className="text-gold-soft">·</span>
+            <span>Otwórz pełen formularz</span>
+            <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
+          </Link>
+        </div>
       </section>
     </>
   );

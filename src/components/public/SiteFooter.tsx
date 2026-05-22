@@ -23,6 +23,7 @@ const FOOTER_NAV_LEFT = [
 const FOOTER_NAV_RIGHT = [
   { href: "/rome", label: "Rzym" },
   { href: "/useful-info", label: "Informacje praktyczne" },
+  { href: "/dla-gosci", label: "Dla gości" },
   { href: "/booking", label: "Rezerwacja" },
   { href: "/privacy", label: "Polityka prywatności" },
 ] as const;

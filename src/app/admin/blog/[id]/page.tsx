@@ -21,7 +21,7 @@ export default async function EditBlogPostPage({ params }: PageProps) {
   const { data, error } = await client
     .from('blog_posts')
     .select(
-      'id, slug, title, excerpt, body_md, hero_image_path, author_signature, published_at, created_at, updated_at',
+      'id, slug, title, excerpt, body_md, hero_image_path, author_signature, published_at, created_at, updated_at, tags',
     )
     .eq('id', id)
     .maybeSingle();
@@ -39,6 +39,7 @@ export default async function EditBlogPostPage({ params }: PageProps) {
     published_at: string | null;
     created_at: string;
     updated_at: string;
+    tags: string[] | null;
   };
 
   const row = data as Row;
@@ -53,6 +54,7 @@ export default async function EditBlogPostPage({ params }: PageProps) {
     publishedAt: row.published_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    tags: row.tags ?? [],
   };
 
   const heroUrl = post.heroImagePath ? publicSiteMediaUrl(post.heroImagePath) : null;

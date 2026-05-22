@@ -13,6 +13,7 @@ import { ArrowLeft, BedDouble, Bath, Users, MapPin } from 'lucide-react';
 
 import { AvailabilityCalendar } from '@/components/public/AvailabilityCalendar';
 import { StatusLegend } from '@/components/public/StatusLegend';
+import { MapEmbed } from '@/components/public/MapEmbed';
 import { ApartmentGallery, type GalleryPhotoEntry } from '@/components/public/ApartmentGallery';
 import { SectionDivider } from '@/components/public/decorative/SectionDivider';
 import { RomanBadge } from '@/components/public/decorative/RomanBadge';
@@ -29,6 +30,9 @@ import {
   filterDisplayablePhotos,
   publicSiteMediaUrl,
 } from '@/lib/data/apartments';
+import { getRestaurants } from '@/lib/data/restaurants';
+import { getAttractions } from '@/lib/data/attractions';
+import { NearbyPlaces } from '@/components/public/NearbyPlaces';
 import { createServerClient } from '@/lib/supabase/server';
 import type { Apartment } from '@/lib/types';
 
@@ -87,6 +91,21 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
   }
 
   const heroDisplay = galleryEntries[0]?.url ?? hero;
+
+  // Najbliższe miejsca w okolicy Orte
+  let nearbyRestaurants: Awaited<ReturnType<typeof getRestaurants>> = [];
+  let nearbyAttractions: Awaited<ReturnType<typeof getAttractions>> = [];
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    try {
+      const client = await createServerClient();
+      [nearbyRestaurants, nearbyAttractions] = await Promise.all([
+        getRestaurants(client),
+        getAttractions(client),
+      ]);
+    } catch (err) {
+      console.warn('apartment nearby:', err);
+    }
+  }
 
   return (
     <div className="bg-crema">
@@ -260,7 +279,26 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
           <p className="mt-4 inline-flex items-center gap-2 text-sm text-italian-green">
             <MapPin size={14} /> Orte · Provincia di Viterbo · Włochy
           </p>
+
+          <div className="mt-6">
+            <MapEmbed
+              latitude={42.4583}
+              longitude={12.3833}
+              address="Orte, Provincia di Viterbo, Włochy"
+              name={apartment.name}
+            />
+          </div>
         </section>
+
+        {(nearbyRestaurants.length > 0 || nearbyAttractions.length > 0) && (
+          <>
+            <SectionDivider motto="cinque minuti a piedi" />
+            <NearbyPlaces
+              restaurants={nearbyRestaurants}
+              attractions={nearbyAttractions}
+            />
+          </>
+        )}
       </div>
     </div>
   );

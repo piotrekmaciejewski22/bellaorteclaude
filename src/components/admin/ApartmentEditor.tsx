@@ -12,7 +12,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Star } from 'lucide-react';
 
 import {
   validateApartment,
@@ -177,6 +177,29 @@ export function ApartmentEditor({ apartment, photos }: ApartmentEditorProps) {
     );
     if (res.ok) router.refresh();
     else alert('Nie udało się usunąć zdjęcia.');
+  }
+
+  async function setAsHero(photoId: string) {
+    // Ustawia wybrane zdjęcie jako pierwsze (display_order=0) i przesuwa
+    // pozostałe — naiwna implementacja per zdjęcie, wystarczy dla 5-10.
+    const others = photos.filter((p) => p.id !== photoId);
+    const updates = [
+      fetch(`/api/admin/apartments/${apartment.id}/photos/${photoId}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ displayOrder: 0 }),
+      }),
+      ...others.map((p, idx) =>
+        fetch(`/api/admin/apartments/${apartment.id}/photos/${p.id}`, {
+          method: 'PATCH',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ displayOrder: idx + 1 }),
+        }),
+      ),
+    ];
+    const results = await Promise.all(updates);
+    if (results.every((r) => r.ok)) router.refresh();
+    else alert('Nie udało się ustawić zdjęcia jako pierwsze.');
   }
 
   return (
@@ -349,8 +372,9 @@ export function ApartmentEditor({ apartment, photos }: ApartmentEditorProps) {
       <section className="rounded-2xl border border-border bg-flag-white p-6">
         <h2 className="heading-section text-2xl text-ink">Galeria zdjęć</h2>
         <p className="text-ui mt-2 text-sm text-cypress/80">
-          Dodawaj zdjęcia placeholderowe lub prawdziwe wnętrza/widoki. Pierwsze
-          zdjęcie z `display_order = 0` jest używane jako miniaturka na stronach.
+          Pierwsze zdjęcie z gwiazdką jest używane jako miniaturka apartamentu
+          na stronie głównej i w liście. Kliknij gwiazdkę przy innym zdjęciu
+          żeby je ustawić jako pierwsze.
         </p>
 
         <form
@@ -401,10 +425,12 @@ export function ApartmentEditor({ apartment, photos }: ApartmentEditorProps) {
           {photos.length === 0 ? (
             <p className="text-sm text-muted">Brak zdjęć w galerii.</p>
           ) : (
-            photos.map((photo) => (
+            photos.map((photo, idx) => (
               <div
                 key={photo.id}
-                className="group relative overflow-hidden rounded-xl border border-border bg-ivory"
+                className={`group relative overflow-hidden rounded-xl border bg-ivory ${
+                  idx === 0 ? 'border-italian-green ring-2 ring-italian-green/30' : 'border-border'
+                }`}
               >
                 <div className="relative aspect-square">
                   <Image
@@ -415,19 +441,38 @@ export function ApartmentEditor({ apartment, photos }: ApartmentEditorProps) {
                     sizes="200px"
                     className="object-cover"
                   />
+                  {idx === 0 && (
+                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-italian-green px-2 py-0.5 text-[10px] font-semibold text-flag-white">
+                      <Star size={10} fill="currentColor" />
+                      Hero
+                    </span>
+                  )}
                 </div>
                 <div className="space-y-1 p-3 text-xs text-cypress">
                   <p className="line-clamp-2">{photo.alt || '(brak opisu)'}</p>
                   <p className="text-muted">{photo.sourceKind}</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => deletePhoto(photo.id)}
-                  aria-label="Usuń zdjęcie"
-                  className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-flag-white/90 text-italian-red shadow-sm opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
-                >
-                  <Trash2 size={14} />
-                </button>
+                <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                  {idx !== 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setAsHero(photo.id)}
+                      aria-label="Ustaw jako pierwsze (hero)"
+                      title="Ustaw jako pierwsze (hero)"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-flag-white/90 text-italian-green shadow-sm hover:bg-italian-green hover:text-flag-white"
+                    >
+                      <Star size={14} />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => deletePhoto(photo.id)}
+                    aria-label="Usuń zdjęcie"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-flag-white/90 text-italian-red shadow-sm hover:bg-italian-red hover:text-flag-white"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             ))
           )}

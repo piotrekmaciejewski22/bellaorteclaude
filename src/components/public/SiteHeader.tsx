@@ -17,6 +17,7 @@ const NAV_LINKS = [
   { href: "/mapa", label: "Mapa" },
   { href: "/blog", label: "Blog" },
   { href: "/wasze-zdjecia", label: "Wasze zdjęcia" },
+  { href: "/dla-gosci", label: "Dla gości" },
   { href: "/rome", label: "Rzym" },
 ] as const;
 

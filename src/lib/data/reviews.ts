@@ -62,6 +62,24 @@ export async function getApprovedReviews(
   return (data ?? []).map((row) => mapReview(row as ReviewRow));
 }
 
+/**
+ * Najnowsze zatwierdzone opinie z dowolnego źródła (restauracja lub
+ * atrakcja) — używane na stronie głównej w sekcji „Co mówią goście".
+ */
+export async function getRecentApprovedReviews(
+  client: SupabaseClient,
+  limit = 6,
+): Promise<Review[]> {
+  const { data, error } = await client
+    .from('reviews')
+    .select(COLUMNS)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(`getRecentApprovedReviews: ${error.message}`);
+  return (data ?? []).map((row) => mapReview(row as ReviewRow));
+}
+
 export function averageRating(reviews: Review[]): number | null {
   if (reviews.length === 0) return null;
   const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
